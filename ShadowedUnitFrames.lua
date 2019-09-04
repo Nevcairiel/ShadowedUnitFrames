@@ -316,6 +316,7 @@ function ShadowUF:LoadUnitDefaults()
 			self.defaults.profile.units[unit].indicators.role = {enabled = true, size = 0}
 			self.defaults.profile.units[unit].indicators.status = {enabled = false, size = 19}
 			self.defaults.profile.units[unit].indicators.resurrect = {enabled = true}
+			self.defaults.profile.units[unit].indicators.sumPending = {enabled = true}
 
 			if( unit ~= "focus" and unit ~= "target" ) then
 				self.defaults.profile.units[unit].indicators.ready = {enabled = true, size = 0}
