@@ -312,7 +312,7 @@ local function hideRestrictedOption(info)
 	elseif( ( key == "incHeal" and not ShadowUF.modules.incHeal ) or ( key == "incAbsorb" and not ShadowUF.modules.incAbsorb ) or ( key == "healAbsorb" and not ShadowUF.modules.healAbsorb ) )  then
 		return true
 	-- Non-standard units do not support color by aggro or incoming heal
-	elseif( key == "colorDispel" ) then
+	elseif( key == "colorDispel" or key == "incHeal" ) then
 		return string.match(unit, "%w+target" )
 	-- Fall back for indicators, no variable table so it shouldn't be shown
 	elseif( info[#(info) - 1] == "indicators" ) then
@@ -1039,6 +1039,13 @@ local function loadGeneralOptions()
 								name = L["Static"],
 								desc = L["Color to use for health bars that are set to be colored by a static color."],
 								arg = "healthColors.static",
+							},
+							inc = {
+								order = 8,
+								type = "color",
+								name = L["Incoming heal"],
+								desc = L["Bar color to use to show how much healing someone is about to receive."],
+								arg = "healthColors.inc",
 							},
 							enemyUnattack = {
 								order = 11,
