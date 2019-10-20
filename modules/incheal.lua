@@ -31,8 +31,7 @@ function IncHeal:OnLayoutApplied(frame)
 	bar:SetReverseFill(frame.healthBar:GetReverseFill())
 	bar:Hide()
 
-	-- TODO: Add option n settings for this value
-	local cap = 1.30
+	local cap = ShadowUF.db.profile.units[frame.unitType].incHeal.cap or 1.20
 
 	-- When we can cheat and put the incoming bar right behind the health bar, we can efficiently show the incoming heal bar
 	-- if the main bar has a transparency set, then we need a more complicated method to stop the health bar from being darker with incoming heals up
@@ -88,16 +87,13 @@ function IncHeal:PositionBar(frame, incAmount)
 		return
 	end
 
-	-- TODO: Add option n settings for this value
-	local cap = 1.30
-
 	if( not bar.total ) then bar:Show() end
 	bar.total = incAmount
 
 	-- When the primary bar has an alpha of 100%, we can cheat and do incoming heals easily. Otherwise we need to do it a more complex way to keep it looking good
 	if( bar.simple ) then
 		bar.total = health + incAmount
-		bar:SetMinMaxValues(0, maxHealth * cap)
+		bar:SetMinMaxValues(0, maxHealth * (ShadowUF.db.profile.units[frame.unitType].incHeal.cap or 1.20))
 		bar:SetValue(bar.total)
 	else
 		local healthSize = bar.healthSize * (health / maxHealth)
