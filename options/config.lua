@@ -3345,6 +3345,37 @@ local function loadUnitOptions()
 							}
 						},
 					},
+					incHeal = {
+						order = 3,
+						type = "group",
+						inline = false,
+						name = L["Incoming heals"],
+						hidden = function(info) return ShadowUF.Units.zoneUnits[info[2]] or hideRestrictedOption(info) end,
+						disabled = function(info) return not getVariable(info[2], "healthBar", nil, "enabled") end,
+						args = {
+							heals = {
+								order = 1,
+								type = "toggle",
+								name = L["Show incoming heals"],
+								desc = L["Adds a bar inside the health bar indicating how much healing someone will receive."],
+								arg = "incHeal.enabled",
+								hidden = false,
+								set = function(info, value)
+									setUnit(info, value)
+									setDirectUnit(info[2], "incHeal", nil, "enabled", getVariable(info[2], "incHeal", nil, "enabled"))
+								end
+							},
+							cap = {
+								order = 3,
+								type = "range",
+								name = L["Outside bar limit"],
+								desc = L["Percentage value of how far outside the unit frame the incoming heal bar can go. 130% means it will go 30% outside the frame, 100% means it will not go outside."],
+								min = 1, max = 1.50, step = 0.05, isPercent = true,
+								arg = "incHeal.cap",
+								hidden = false,
+							},
+						},
+					},
 					totemBar = {
 						order = 3.6,
 						type = "group",
