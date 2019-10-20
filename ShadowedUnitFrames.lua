@@ -311,8 +311,6 @@ function ShadowUF:LoadUnitDefaults()
 
 			if( unit ~= "battleground" and unit ~= "battlegroundpet" and unit ~= "arena" and unit ~= "arenapet" and unit ~= "boss" ) then
 				self.defaults.profile.units[unit].incHeal = {enabled = true, cap = 1.20}
-				self.defaults.profile.units[unit].incAbsorb = {enabled = true, cap = 1.30}
-				self.defaults.profile.units[unit].healAbsorb = {enabled = true, cap = 1.30}
 			end
 		end
 
