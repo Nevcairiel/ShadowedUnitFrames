@@ -174,8 +174,6 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 		static = {r = 0.70, g = 0.20, b = 0.90},
 		yellow = {r = 0.93, g = 0.93, b = 0.0},
 		inc = {r = 0, g = 0.35, b = 0.23},
-		incAbsorb = {r = 0.93, g = 0.75, b = 0.09},
-		healAbsorb = {r = 0.68, g = 0.47, b = 1},
 		enemyUnattack = {r = 0.60, g = 0.20, b = 0.20},
 		hostile = {r = 0.90, g = 0.0, b = 0.0},
 		friendly = {r = 0.20, g = 0.90, b = 0.20},

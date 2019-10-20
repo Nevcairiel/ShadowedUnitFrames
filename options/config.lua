@@ -309,7 +309,7 @@ local function hideRestrictedOption(info)
 	local key = info[#(info)]
 	if( ShadowUF.modules[key] and ShadowUF.modules[key].moduleClass and ShadowUF.modules[key].moduleClass ~= playerClass ) then
 		return true
-	elseif( ( key == "incHeal" and not ShadowUF.modules.incHeal ) or ( key == "incAbsorb" and not ShadowUF.modules.incAbsorb ) or ( key == "healAbsorb" and not ShadowUF.modules.healAbsorb ) )  then
+	elseif( key == "incHeal" and not ShadowUF.modules.incHeal )  then
 		return true
 	-- Non-standard units do not support color by aggro or incoming heal
 	elseif( key == "colorDispel" or key == "incHeal" ) then
@@ -1048,7 +1048,7 @@ local function loadGeneralOptions()
 								arg = "healthColors.inc",
 							},
 							enemyUnattack = {
-								order = 11,
+								order = 9,
 								type = "color",
 								name = L["Unattackable hostile"],
 								desc = L["Health bar color to use for hostile units who you cannot attack, used for reaction coloring."],
