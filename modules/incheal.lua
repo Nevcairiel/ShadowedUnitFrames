@@ -1,8 +1,11 @@
 local IncHeal = {}
 ShadowUF:RegisterModule(IncHeal, "incHeal", ShadowUF.L["Incoming heals"])
+local HealComm = LibStub("LibHealComm-4.0", true)
+local frames = {}
 
 function IncHeal:OnEnable(frame)
 	frame.incHeal = frame.incHeal or ShadowUF.Units:CreateBar(frame)
+	frames[frame] = true
 
 	frame:RegisterUnitEvent("UNIT_MAXHEALTH", self, "UpdateFrame")
 	frame:RegisterUnitEvent("UNIT_HEALTH", self, "UpdateFrame")
@@ -116,5 +119,43 @@ function IncHeal:PositionBar(frame, incAmount)
 end
 
 function IncHeal:UpdateFrame(frame)
-	self:PositionBar(frame, 0)
+	if( not frame.visibility.incHeal or not frame.visibility.healthBar ) then return end
+	self:PositionBar(frame, (HealComm:GetHealAmount(frame.unitGUID, HealComm.ALL_HEALS) or 0) * (HealComm:GetHealModifier(frame.unitGUID) or 1))
 end
+
+-- Handle callbacks from LibHealComm-4.0
+function IncHeal:HandleHealCommUpdate(...)
+	for frame in pairs(frames) do
+		if ( frame.unitGUID ) then
+			for i=1, select("#", ...) do
+				if( select(i, ...) == frame.unitGUID ) then
+					self:UpdateFrame(frame)
+					break
+				end
+			end
+		end
+	end
+end
+
+function IncHeal:HealComm_HealUpdated(event, casterGUID, spellID, bitType, endTime, ...)
+	IncHeal:HandleHealCommUpdate(...)
+end
+
+function IncHeal:HealComm_HealStopped(event, casterGUID, spellID, bitType, interrupted, ...)
+	IncHeal:HandleHealCommUpdate(...)
+end
+
+function IncHeal:HealComm_ModifierChanged(event, guid)
+	IncHeal:HandleHealCommUpdate(guid)
+end
+
+function IncHeal:HealComm_GUIDDisappeared(event, guid)
+	IncHeal:HandleHealCommUpdate(guid)
+end
+
+HealComm.RegisterCallback(IncHeal, "HealComm_HealStarted", "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealDelayed", "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealStopped")
+HealComm.RegisterCallback(IncHeal, "HealComm_ModifierChanged")
+HealComm.RegisterCallback(IncHeal, "HealComm_GUIDDisappeared")
