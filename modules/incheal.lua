@@ -1,8 +1,11 @@
 local IncHeal = {}
 ShadowUF:RegisterModule(IncHeal, "incHeal", ShadowUF.L["Incoming heals"])
+local HealComm = LibStub("LibClassicHealComm-1.0", true)
+local frames = {}
 
 function IncHeal:OnEnable(frame)
 	frame.incHeal = frame.incHeal or ShadowUF.Units:CreateBar(frame)
+	frames[frame] = true
 
 	frame:RegisterUnitEvent("UNIT_MAXHEALTH", self, "UpdateFrame")
 	frame:RegisterUnitEvent("UNIT_HEALTH", self, "UpdateFrame")
@@ -122,5 +125,42 @@ function IncHeal:PositionBar(frame, incAmount)
 end
 
 function IncHeal:UpdateFrame(frame)
-	self:PositionBar(frame, 0)
+	local amount = (HealComm:GetHealAmount(frame.unitGUID, HealComm.ALL_HEALS) or 0) * (HealComm:GetHealModifier(frame.unitGUID) or 1)
+	if( not frame.visibility.incHeal or not frame.visibility.healthBar ) then return end
+	self:PositionBar(frame, amount)
 end
+
+function IncHeal:UpdateHealComm(...)
+	for frame in pairs(frames) do
+		for i=1, select("#", ...) do
+			if( select(i, ...) == frame.unitGUID ) and (UnitPlayerOrPetInParty(frame.unit) or UnitPlayerOrPetInRaid(frame.unit) or UnitIsUnit("player",frame.unit) or UnitIsUnit("pet",frame.unit)) then
+				self:UpdateFrame(frame)
+				break
+			end
+		end
+	end
+end
+
+-- Handle callbacks from HealComm
+function IncHeal:HealComm_HealUpdated(event, casterGUID, spellID, healType, endTime, ...)
+	IncHeal:UpdateHealComm(...)
+end
+
+function IncHeal:HealComm_HealStopped(event, casterGUID, spellID, healType, interrupted, ...)
+	IncHeal:UpdateHealComm(...)
+end
+
+function IncHeal:HealComm_ModifierChanged(event, guid)
+	IncHeal:UpdateHealComm(guid)
+end
+
+function IncHeal:HealComm_GUIDDisappeared(event, guid)
+	IncHeal:UpdateHealComm(guid)
+end
+
+HealComm.RegisterCallback(IncHeal, "HealComm_HealStarted", "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealStopped")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealDelayed", "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_HealUpdated")
+HealComm.RegisterCallback(IncHeal, "HealComm_ModifierChanged")
+HealComm.RegisterCallback(IncHeal, "HealComm_GUIDDisappeared")
