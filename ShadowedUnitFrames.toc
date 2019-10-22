@@ -39,6 +39,7 @@ modules\defaultlayout.lua
 modules\highlight.lua
 modules\tags.lua
 modules\health.lua
+modules\incheal.lua
 modules\power.lua
 modules\portrait.lua
 modules\indicators.lua
