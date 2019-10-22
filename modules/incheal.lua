@@ -84,7 +84,7 @@ function IncHeal:PositionBar(frame, incAmount)
 	local health = UnitHealth(frame.unit)
 	local maxHealth = UnitHealthMax(frame.unit)
 
-	if( incAmount <= 0 or health <= 0 or maxHealth <= 0 ) then
+	if( incAmount <= 0 or UnitIsDeadOrGhost(frame.unit) or maxHealth <= 0 ) then
 		bar.total = nil
 		bar:Hide()
 		return
