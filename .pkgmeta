@@ -14,6 +14,8 @@ externals:
         url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
     libs/LibSpellRange-1.0:
         url: https://github.com/ascott18/LibSpellRange-1.0.git
+    libs/LibHealComm-4.0:
+        url: https://repos.wowace.com/wow/libhealcomm-4-0
     libs/LibClassicDurations:
         url: https://repos.curseforge.com/wow/libclassicdurations
     libs/LibClassicCasterino:
@@ -24,8 +26,6 @@ externals:
         url: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
     options/libs/AceGUI-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
-    options/libs/LibHealComm-4.0:
-        url: https://repos.wowace.com/wow/libhealcomm-4-0
     options/libs/AceGUI-3.0-SharedMediaWidgets:
         url: https://repos.wowace.com/wow/ace-gui-3-0-shared-media-widgets/trunk/AceGUI-3.0-SharedMediaWidgets
 
