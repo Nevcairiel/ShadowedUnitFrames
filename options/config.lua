@@ -1066,7 +1066,7 @@ local function loadGeneralOptions()
 								order = 10,
 								type = "color",
 								name = L["Heal absorb"],
-								desc = L["Color to use to show how much healing will e absorbed."],
+								desc = L["Color to use to show how much healing will be absorbed."],
 								arg = "healthColors.healAbsorb",
 							},
 							enemyUnattack = {
