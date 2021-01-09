@@ -2,9 +2,13 @@ local Totems = {}
 local totemColors = {}
 local MAX_TOTEMS = MAX_TOTEMS
 
--- Death Knights untalented ghouls are guardians and are considered totems........... so set it up for them
 local playerClass = select(2, UnitClass("player"))
-if( playerClass == "DRUID" ) then
+if( playerClass == "DEATHKNIGHT" ) then
+	MAX_TOTEMS = 1
+	-- Unholy DKs get rank 2 on level 29 which converts their ghoul into a proper pet.  
+	local spec = (UnitLevel("player") < 29) and {1, 2, 3} or {1, 2}
+	ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Totem bar"], true, "DEATHKNIGHT", spec, 12)
+elseif( playerClass == "DRUID" ) then
 	MAX_TOTEMS = 1
 	ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Mushroom bar"], true, "DRUID", 4, 39)
 elseif( playerClass == "MONK" ) then
