@@ -66,7 +66,7 @@ function Portrait:Update(frame, event)
 		local classToken = frame:UnitClassToken()
 		if( classToken ) then
 			frame.portrait:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes")
-			frame.portrait:SetTexCoord(CLASS_ICON_TCOORDS[classToken][1], CLASS_ICON_TCOORDS[classToken][2], CLASS_ICON_TCOORDS[classToken][3], CLASS_ICON_TCOORDS[classToken][4])
+			frame.portrait:SetTexCoord(CLASS_ICON_TCOORDS[classToken][1]+0.02, CLASS_ICON_TCOORDS[classToken][2]-0.02, CLASS_ICON_TCOORDS[classToken][3]+0.02, CLASS_ICON_TCOORDS[classToken][4]-0.05)
 		else
 			frame.portrait:SetTexture("")
 		end
