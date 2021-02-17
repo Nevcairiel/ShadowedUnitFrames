@@ -118,20 +118,25 @@ end
 
 
 function Fader:Update(frame, event)
+	local ignoreCasting = ShadowUF.db.profile.units[frame.unitType].fader.ignoreCasting;
+	local ignoreHealthRegen = ShadowUF.db.profile.units[frame.unitType].fader.ignoreHealthRegen;
+	local ignorePowerRegen = ShadowUF.db.profile.units[frame.unitType].fader.ignorePowerRegen;
+	local ignoreTargetting = ShadowUF.db.profile.units[frame.unitType].fader.ignoreTargetting;
+
 	-- In combat, fade back in
 	if( InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" ) then
 		startFading(frame, "in", ShadowUF.db.profile.units[frame.unitType].fader.combatAlpha)
 	-- Player is casting, fade in
-	elseif( frame.fader.playerCasting ) then
+	elseif( not ignoreCasting and frame.fader.playerCasting ) then
 		startFading(frame, "in", ShadowUF.db.profile.units[frame.unitType].fader.combatAlpha, true)
 	-- Ether mana or energy is not at 100%, fade in
-	elseif( ( UnitPowerType(frame.unit) == 0 or UnitPowerType(frame.unit) == 3 ) and UnitPower(frame.unit) ~= UnitPowerMax(frame.unit) ) then
+	elseif( not ignorePowerRegen and ( UnitPowerType(frame.unit) == 0 or UnitPowerType(frame.unit) == 3 ) and UnitPower(frame.unit) ~= UnitPowerMax(frame.unit) ) then
 		startFading(frame, "in", ShadowUF.db.profile.units[frame.unitType].fader.combatAlpha)
 	-- Health is not at max, fade in
-	elseif( UnitHealth(frame.unit) ~= UnitHealthMax(frame.unit) ) then
+	elseif( not ignoreHealthRegen and UnitHealth(frame.unit) ~= UnitHealthMax(frame.unit) ) then
 		startFading(frame, "in", ShadowUF.db.profile.units[frame.unitType].fader.combatAlpha)
 	-- Targetting somebody, fade in
-	elseif( frame.unitType == "player" and UnitExists("target") ) then
+	elseif( not ignoreTargetting and frame.unitType == "player" and UnitExists("target") ) then
 		startFading(frame, "in", ShadowUF.db.profile.units[frame.unitType].fader.combatAlpha)
 	-- Nothing else? Fade out!
 	else
