@@ -1,87 +1,162 @@
 local Range = {
-	friendly = {["PRIEST"] = GetSpellInfo(2050), ["DRUID"] = GetSpellInfo(48378), ["PALADIN"] = GetSpellInfo(48782), ["SHAMAN"] = GetSpellInfo(49273)},
-	hostile = {["PRIEST"] = GetSpellInfo(48127), ["DRUID"] = GetSpellInfo(48461), ["PALADIN"] = GetSpellInfo(62124), ["HUNTER"] = GetSpellInfo(75), ["WARLOCK"] = GetSpellInfo(686), ["SHAMAN"] = GetSpellInfo(529), ["MAGE"] = GetSpellInfo(133), ["DEATHKNIGHT"] = GetSpellInfo(49576)},
-	resurrect = {["PALADIN"] = GetSpellInfo(48950), ["PRIEST"] = GetSpellInfo(25435), ["SHAMAN"] = GetSpellInfo(2008), ["DRUID"] = GetSpellInfo(48477)}
+	friendly = {
+		["PRIEST"] = {
+			(GetSpellInfo(17)), -- Power Word: Shield
+			(GetSpellInfo(527)), -- Purify
+		},
+		["DRUID"] = {
+			(GetSpellInfo(774)), -- Rejuvenation
+			(GetSpellInfo(2782)), -- Remove Corruption
+		},
+		["PALADIN"] = GetSpellInfo(19750), -- Flash of Light
+		["SHAMAN"] = GetSpellInfo(8004), -- Healing Surge
+		["WARLOCK"] = GetSpellInfo(5697), -- Unending Breath
+		--["DEATHKNIGHT"] = GetSpellInfo(47541), -- Death Coil
+		["MONK"] = GetSpellInfo(115450), -- Detox
+	},
+	hostile = {
+		["DEATHKNIGHT"] = {
+			(GetSpellInfo(47541)), -- Death Coil
+			(GetSpellInfo(49576)), -- Death Grip
+		},
+		["DEMONHUNTER"] = GetSpellInfo(185123), -- Throw Glaive
+		["DRUID"] = GetSpellInfo(8921),  -- Moonfire
+		["HUNTER"] = {
+			(GetSpellInfo(193455)), -- Cobra Shot
+			(GetSpellInfo(19434)), -- Aimed Short
+			(GetSpellInfo(193265)), -- Hatchet Toss
+		},
+		["MAGE"] = {
+			(GetSpellInfo(116)), -- Frostbolt
+			(GetSpellInfo(30451)), -- Arcane Blast
+			(GetSpellInfo(133)), -- Fireball
+		},
+		["MONK"] = GetSpellInfo(115546), -- Provoke
+		["PALADIN"] = GetSpellInfo(62124), -- Hand of Reckoning
+		["PRIEST"] = GetSpellInfo(585), -- Smite
+		--["ROGUE"] = GetSpellInfo(1725), -- Distract
+		["SHAMAN"] = GetSpellInfo(403), -- Lightning Bolt
+		["WARLOCK"] = GetSpellInfo(686), -- Shadow Bolt
+		["WARRIOR"] = GetSpellInfo(355), -- Taunt
+	},
 }
+
 ShadowUF:RegisterModule(Range, "range", ShadowUF.L["Range indicator"])
 
-local playerClass = select(2, UnitClass("player"))
-local friendlySpell, hostileSpell
-local resurrectSpell = Range.resurrect[playerClass]
+local LSR = LibStub("SpellRange-1.0")
 
-local function checkRange(self, elapsed)
-	self.timeElapsed = self.timeElapsed + elapsed
-	if( self.timeElapsed <= 0.50 ) then return end
-	self.timeElapsed = 0
-	
-	if( self.isFriendly and resurrectSpell and UnitIsDead(self.parent.unit) ) then
-		self.parent:SetRangeAlpha(IsSpellInRange(resurrectSpell, self.parent.unit) == 1 and ShadowUF.db.profile.units[self.parent.unitType].range.inAlpha or ShadowUF.db.profile.units[self.parent.unitType].range.oorAlpha)
-	-- We set a spell for them in our flags check, use that
-	elseif( self.spell ) then
-		self.parent:SetRangeAlpha(IsSpellInRange(self.spell, self.parent.unit) == 1 and ShadowUF.db.profile.units[self.parent.unitType].range.inAlpha or ShadowUF.db.profile.units[self.parent.unitType].range.oorAlpha)
+local playerClass = select(2, UnitClass("player"))
+local rangeSpells = {}
+
+local UnitPhaseReason_o = UnitPhaseReason
+local UnitPhaseReason = function(unit)
+	local phase = UnitPhaseReason_o(unit)
+	if (phase == Enum.PhaseReason.WarMode or phase == Enum.PhaseReason.ChromieTime) and UnitIsVisible(unit) then
+		return nil
+	end
+	return phase
+end
+
+local function checkRange(self)
+	local frame = self.parent
+
+	-- Check which spell to use
+	local spell
+	if( UnitCanAssist("player", frame.unit) ) then
+		spell = rangeSpells.friendly
+	elseif( UnitCanAttack("player", frame.unit) ) then
+		spell = rangeSpells.hostile
+	end
+
+	if( not UnitIsConnected(frame.unit) or UnitPhaseReason(frame.unit) ) then
+		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
+	elseif( spell ) then
+		frame:SetRangeAlpha(LSR.IsSpellInRange(spell, frame.unit) == 1 and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	-- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
-	elseif( self.grouped ) then
-		self.parent:SetRangeAlpha(UnitInRange(self.parent.unit, "player") and ShadowUF.db.profile.units[self.parent.unitType].range.inAlpha or ShadowUF.db.profile.units[self.parent.unitType].range.oorAlpha)
+	elseif( UnitInRaid(frame.unit) or UnitInParty(frame.unit) ) then
+		frame:SetRangeAlpha(UnitInRange(frame.unit, "player") and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	-- Nope, fall back to interaction :(
-	elseif( self.isFriendly ) then
-		self.parent:SetRangeAlpha(CheckInteractDistance(self.parent.unit, 4) and ShadowUF.db.profile.units[self.parent.unitType].range.inAlpha or ShadowUF.db.profile.units[self.parent.unitType].range.oorAlpha)
 	else
-		self.parent:SetRangeAlpha(ShadowUF.db.profile.units[self.parent.unitType].range.inAlpha)
+		frame:SetRangeAlpha(CheckInteractDistance(frame.unit, 1) and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
+	end
+end
+
+local function updateSpellCache(category)
+	rangeSpells[category] = nil
+	if( IsUsableSpell(ShadowUF.db.profile.range[category .. playerClass]) ) then
+		rangeSpells[category] = ShadowUF.db.profile.range[category .. playerClass]
+
+	elseif( IsUsableSpell(ShadowUF.db.profile.range[category .. "Alt" .. playerClass]) ) then
+		rangeSpells[category] = ShadowUF.db.profile.range[category .. "Alt" .. playerClass]
+
+	elseif( Range[category][playerClass] ) then
+		if( type(Range[category][playerClass]) == "table" ) then
+			for i = 1, #Range[category][playerClass] do
+				local spell = Range[category][playerClass][i]
+				if( IsUsableSpell(spell) ) then
+					rangeSpells[category] = spell
+					break
+				end
+			end
+		elseif( IsUsableSpell(Range[category][playerClass]) ) then
+			rangeSpells[category] = Range[category][playerClass]
+		end
+	end
+end
+
+local function createTimer(frame)
+	if( not frame.range.timer ) then
+		frame.range.timer = C_Timer.NewTicker(0.5, checkRange)
+		frame.range.timer.parent = frame
+	end
+end
+
+local function cancelTimer(frame)
+	if( frame.range and frame.range.timer ) then
+		frame.range.timer:Cancel()
+		frame.range.timer = nil
 	end
 end
 
 function Range:ForceUpdate(frame)
-	checkRange(frame.range, 1)
+	if( UnitIsUnit(frame.unit, "player") ) then
+		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.inAlpha)
+		cancelTimer(frame)
+	else
+		createTimer(frame)
+		checkRange(frame.range.timer)
+	end
 end
 
 function Range:OnEnable(frame)
 	if( not frame.range ) then
 		frame.range = CreateFrame("Frame", nil, frame)
-		frame.range:SetScript("OnUpdate", checkRange)
-		frame.range.timeElapsed = 0
-		frame.range.parent = frame
-		frame.range:Hide()
 	end
-	
-	-- I want to say UNIT_FACTION is the function thats called when a unit is MCed, but not 100% sure
-	frame:RegisterUnitEvent("UNIT_FACTION", self, "UpdateFlags")
-	frame:RegisterNormalEvent("PARTY_MEMBERS_CHANGED", self, "UpdateFlags")
-	frame:RegisterNormalEvent("RAID_ROSTER_UPDATE", self, "UpdateFlags")
 
-	frame:RegisterUpdateFunc(self, "UpdateFlags")
+	frame:RegisterNormalEvent("PLAYER_SPECIALIZATION_CHANGED", self, "SpellChecks")
 	frame:RegisterUpdateFunc(self, "ForceUpdate")
+
+	createTimer(frame)
 end
 
 function Range:OnLayoutApplied(frame)
-	if( frame.visibility.range ) then
-		frame.range.hostileSpell = ShadowUF.db.profile.range["hostile" .. playerClass] or self.hostile[playerClass]
-		frame.range.friendlySpell = ShadowUF.db.profile.range["friendly" .. playerClass] or self.friendly[playerClass]
-	end
+	self:SpellChecks(frame)
 end
 
 function Range:OnDisable(frame)
 	frame:UnregisterAll(self)
-	
+
 	if( frame.range ) then
-		frame.range:Hide()
+		cancelTimer(frame)
 		frame:SetRangeAlpha(1.0)
 	end
 end
 
--- I'd rather store the flags here, they rarely change and we can do that based off events, no sense in doing it eveyr 0.50s
-function Range:UpdateFlags(frame)
-	frame.range.canAttack = UnitCanAttack("player", frame.unit)
-	frame.range.isFriendly = UnitIsFriend("player", frame.unit) and UnitCanAssist("player", frame.unit)
-	frame.range.grouped = UnitInRaid(frame.unit) or UnitInParty(frame.unit)
-	frame.range.spell = frame.range.canAttack and frame.range.hostileSpell or frame.range.isFriendly and frame.range.friendlySpell or nil
-	
-	-- No sense in updating range if we have no data
-	if( UnitIsGhost(frame.unit) or not UnitIsConnected(frame.unit) or ( not frame.range.spell and not frame.range.grouped and not frame.range.isFriendly ) ) then
-		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.inAlpha)
-		frame.range:Hide()
-	else
-		frame.range:Show()
+
+function Range:SpellChecks(frame)
+	updateSpellCache("friendly")
+	updateSpellCache("hostile")
+	if( frame.range and ShadowUF.db.profile.units[frame.unitType].range.enabled ) then
+		self:ForceUpdate(frame)
 	end
 end
-
-

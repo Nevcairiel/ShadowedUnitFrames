@@ -3,7 +3,7 @@ ShadowUF:RegisterModule(Portrait, "portrait", ShadowUF.L["Portrait"])
 
 -- If the camera isn't reset OnShow, it'll show the entire character instead of just the head, odd I know
 local function resetCamera(self)
-	self:SetCamera(0)
+	self:SetPortraitZoom(1)
 end
 
 local function resetGUID(self)
@@ -13,12 +13,7 @@ end
 function Portrait:OnEnable(frame)
 	frame:RegisterUnitEvent("UNIT_PORTRAIT_UPDATE", self, "UpdateFunc")
 	frame:RegisterUnitEvent("UNIT_MODEL_CHANGED", self, "Update")
-	
-	if( frame.unitRealType == "party" ) then
-	--	frame:RegisterNormalEvent("PARTY_MEMBER_ENABLE", self, "Update")
-	-- frame:RegisterNormalEvent("PARTY_MEMBER_DISABLE", self, "Update")
-	end
-	
+
 	frame:RegisterUpdateFunc(self, "UpdateFunc")
 end
 
@@ -36,7 +31,7 @@ function Portrait:OnPreLayoutApply(frame, config)
 			frame.portraitModel:SetScript("OnHide", resetGUID)
 			frame.portraitModel.parent = frame
 		end
-				
+
 		frame.portrait = frame.portraitModel
 		frame.portrait:Show()
 
@@ -57,7 +52,7 @@ function Portrait:UpdateFunc(frame)
 		if( frame.portrait.guid ~= guid ) then
 			self:Update(frame)
 		end
-		
+
 		frame.portrait.guid = guid
 	else
 		self:Update(frame)
@@ -66,10 +61,9 @@ end
 
 function Portrait:Update(frame, event)
 	local type = ShadowUF.db.profile.units[frame.unitType].portrait.type
-	
 	-- Use class thingy
 	if( type == "class" ) then
-		local classToken = select(2, UnitClass(frame.unitOwner))
+		local classToken = frame:UnitClassToken()
 		if( classToken ) then
 			frame.portrait:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes")
 			frame.portrait:SetTexCoord(CLASS_ICON_TCOORDS[classToken][1], CLASS_ICON_TCOORDS[classToken][2], CLASS_ICON_TCOORDS[classToken][3], CLASS_ICON_TCOORDS[classToken][4])
@@ -80,15 +74,19 @@ function Portrait:Update(frame, event)
 	elseif( type == "2D" ) then
 		frame.portrait:SetTexCoord(0.10, 0.90, 0.10, 0.90)
 		SetPortraitTexture(frame.portrait, frame.unitOwner)
-	-- Using 3D portrait, but the players not in range so swap to 2D
+	-- Using 3D portrait, but the players not in range so swap to question mark
 	elseif( not UnitIsVisible(frame.unitOwner) or not UnitIsConnected(frame.unitOwner) ) then
-		frame.portrait:SetModelScale(4.25)
-		frame.portrait:SetPosition(0, 0, -1.5)
-		frame.portrait:SetModel("Interface\\Buttons\\talktomequestionmark.mdx")
+		frame.portrait:ClearModel()
+		frame.portrait:SetModelScale(5.5)
+		frame.portrait:SetPosition(0, 0, -0.8)
+		frame.portrait:SetModel("Interface\\Buttons\\talktomequestionmark.m2")
+
 	-- Use animated 3D portrait
 	else
+		frame.portrait:ClearModel()
 		frame.portrait:SetUnit(frame.unitOwner)
-		frame.portrait:SetCamera(0)
+		frame.portrait:SetPortraitZoom(1)
+		frame.portrait:SetPosition(0, 0, 0)
 		frame.portrait:Show()
 	end
 end

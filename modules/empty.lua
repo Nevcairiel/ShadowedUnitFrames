@@ -19,7 +19,7 @@ function Empty:OnLayoutApplied(frame)
 		local color = frame.emptyBar.background.overrideColor or fallbackColor
 		frame.emptyBar.background:SetVertexColor(color.r, color.g, color.b, ShadowUF.db.profile.bars.alpha)
 
-		if( ShadowUF.db.profile.units[frame.unitType].emptyBar.reaction or ShadowUF.db.profile.units[frame.unitType].emptyBar.class ) then
+		if( ShadowUF.db.profile.units[frame.unitType].emptyBar.reactionType or ShadowUF.db.profile.units[frame.unitType].emptyBar.class ) then
 			frame:RegisterUnitEvent("UNIT_FACTION", self, "UpdateColor")
 			frame:RegisterUpdateFunc(self, "UpdateColor")
 		else
@@ -31,7 +31,10 @@ end
 function Empty:UpdateColor(frame)
 	local color
 	local reactionType = ShadowUF.db.profile.units[frame.unitType].emptyBar.reactionType
-	if( not UnitPlayerOrPetInRaid(frame.unit) and not UnitPlayerOrPetInParty(frame.unit) and ( ( ( reactionType == "player" or reactionType == "both" ) and UnitIsPlayer(frame.unit) and not UnitIsFriend(frame.unit, "player") ) or ( ( reactionType == "npc" or reactionType == "both" ) and not UnitIsPlayer(frame.unit) ) ) ) then
+
+	if( ( reactionType == "npc" or reactionType == "both" ) and not UnitPlayerControlled(frame.unit) and UnitIsTapDenied(frame.unit) and UnitCanAttack("player", frame.unit) ) then
+		color = ShadowUF.db.profile.healthColors.tapped
+	elseif( not UnitPlayerOrPetInRaid(frame.unit) and not UnitPlayerOrPetInParty(frame.unit) and ( ( ( reactionType == "player" or reactionType == "both" ) and UnitIsPlayer(frame.unit) and not UnitIsFriend(frame.unit, "player") ) or ( ( reactionType == "npc" or reactionType == "both" ) and not UnitIsPlayer(frame.unit) ) ) ) then
 		if( not UnitIsFriend(frame.unit, "player") and UnitPlayerControlled(frame.unit) ) then
 			if( UnitCanAttack("player", frame.unit) ) then
 				color = ShadowUF.db.profile.healthColors.hostile
@@ -49,10 +52,10 @@ function Empty:UpdateColor(frame)
 			end
 		end
 	elseif( ShadowUF.db.profile.units[frame.unitType].emptyBar.class and ( UnitIsPlayer(frame.unit) or UnitCreatureFamily(frame.unit) ) ) then
-		local class = UnitCreatureFamily(frame.unit) or select(2, UnitClass(frame.unit))
+		local class = UnitCreatureFamily(frame.unit) or frame:UnitClassToken()
 		color = class and ShadowUF.db.profile.classColors[class]
 	end
-	
+
 	color = color or frame.emptyBar.background.overrideColor or fallbackColor
 	frame.emptyBar.background:SetVertexColor(color.r, color.g, color.b, ShadowUF.db.profile.bars.alpha)
 end
