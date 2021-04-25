@@ -1,4 +1,4 @@
-## Interface: 11305
+## Interface: 11307
 ## Title: Shadowed Unit Frames
 ## Notes: Moooooooooooooooooo
 ## Author: Shadowed
