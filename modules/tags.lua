@@ -366,6 +366,17 @@ function ShadowUF:FormatShortTime(seconds)
 	return string.format("%ds", seconds)
 end
 
+-- Threat colors
+function ShadowUF:threatColor(state)
+	if( state == 3 ) then
+		return 1, 0, 0
+	elseif( state == 2 ) then
+		return 1, 0.6, 0
+	elseif( state == 1 ) then
+		return 1, 1, 0.47
+	end
+end
+
 -- Name abbreviation
 local function abbreviateName(text)
 	return string.sub(text, 1, 1) .. "."
@@ -377,6 +388,8 @@ Tags.abbrevCache = setmetatable({}, {
 		rawset(tbl, val, val)
 		return val
 end})
+
+
 
 -- Going to have to start using an env wrapper for tags I think
 local Druid = {}
@@ -444,6 +457,60 @@ Tags.defaultTags = {
 	["abbrev:name"] = [[function(unit, unitOwner)
 		local name = UnitName(unitOwner) or UNKNOWN
 		return string.len(name) > 10 and ShadowUF.Tags.abbrevCache[name] or name
+	end]],
+	["unit:situation"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation(unit)
+		if( state == 3 ) then
+			return ShadowUF.L["Aggro"]
+		elseif( state == 2 ) then
+			return ShadowUF.L["High"]
+		elseif( state == 1 ) then
+			return ShadowUF.L["Medium"]
+		end
+	end]],
+	["situation"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation("player", "target")
+		if( state == 3 ) then
+			return ShadowUF.L["Aggro"]
+		elseif( state == 2 ) then
+			return ShadowUF.L["High"]
+		elseif( state == 1 ) then
+			return ShadowUF.L["Medium"]
+		end
+	end]],
+	["unit:color:sit"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation(unit)
+		return state and state > 0 and ShadowUF:Hex(ShadowUF:threatColor(state))
+	end]],
+	["unit:color:aggro"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation(unit)
+		return state and state >= 3 and ShadowUF:Hex(ShadowUF:threatColor(state))
+	end]],
+	["color:sit"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation("player", "target")
+		return state and state > 0 and ShadowUF:Hex(ShadowUF:threatColor(state))
+	end]],
+	["color:aggro"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation("player", "target")
+		return state and state >= 3 and ShadowUF:Hex(ShadowUF:threatColor(state))
+	end]],
+	["scaled:threat"] = [[function(unit, unitOwner)
+		local scaled = select(3, UnitDetailedThreatSituation("player", "target"))
+		return scaled and string.format("%d%%", scaled)
+	end]],
+	["general:sit"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation("player")
+		if( state == 3 ) then
+			return ShadowUF.L["Aggro"]
+		elseif( state == 2 ) then
+			return ShadowUF.L["High"]
+		elseif( state == 1 ) then
+			return ShadowUF.L["Medium"]
+		end
+	end]],
+	["color:gensit"] = [[function(unit, unitOwner)
+		local state = UnitThreatSituation("player")
+		return state and state > 0 and ShadowUF:Hex(ShadowUF:threatColor(state))
 	end]],
 	["status:time"] = [[function(unit, unitOwner)
 		local offlineStatus = ShadowUF.Tags.offlineStatus
@@ -977,6 +1044,15 @@ Tags.defaultEvents = {
 	["shortclassification"] 	= "UNIT_CLASSIFICATION_CHANGED",
 	["dechp"]					= "UNIT_HEALTH UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH",
 	["group"]					= "GROUP_ROSTER_UPDATE",
+	["unit:situation"]			= "UNIT_THREAT_SITUATION_UPDATE",
+	["situation"]				= "UNIT_THREAT_SITUATION_UPDATE",
+	["unit:color:sit"]          = "UNIT_THREAT_SITUATION_UPDATE",
+	["unit:color:aggro"]        = "UNIT_THREAT_SITUATION_UPDATE",
+	["color:sit"]               = "UNIT_THREAT_SITUATION_UPDATE",
+	["color:aggro"]             = "UNIT_THREAT_SITUATION_UPDATE",
+	["scaled:threat"]           = "UNIT_THREAT_SITUATION_UPDATE",
+	["general:sit"]             = "UNIT_THREAT_SITUATION_UPDATE",
+	["color:gensit"]            = "UNIT_THREAT_SITUATION_UPDATE",
 }
 
 -- Default update frequencies for tag updating, used if it's needed to override the update speed
@@ -988,6 +1064,7 @@ Tags.defaultFrequents = {
 	["pvp:time"] = 1,
 	["unit:raid:targeting"] = 0.50,
 	["unit:raid:assist"] = 0.50,
+	["scaled:threat"] = 1,
 }
 
 -- Default tag categories
@@ -1057,6 +1134,15 @@ Tags.defaultCategories = {
 	["hpower"]					= "classspec",
 	["unit:raid:assist"]		= "raid",
 	["unit:raid:targeting"] 	= "raid",
+	["unit:situation"]          = "threat",
+	["situation"]               = "playerthreat",
+	["unit:color:sit"]          = "threat",
+	["unit:color:aggro"]        = "threat",
+	["color:sit"]               = "playerthreat",
+	["color:aggro"]				= "playerthreat",
+	["scaled:threat"]           = "playerthreat",
+	["general:sit"]             = "playerthreat",
+	["color:gensit"]            = "playerthreat",
 }
 
 -- Default tag help
@@ -1129,6 +1215,15 @@ Tags.defaultHelp = {
 	["sec:absolutepp"]			= string.format(L["Works the same as [%s], but always shows mana and is only shown if mana is a secondary power."], "absolutepp"),
 	["unit:raid:targeting"]		= L["How many people in your raid are targeting the unit, for example if you put this on yourself it will show how many people are targeting you. This includes you in the count!"],
 	["unit:raid:assist"]		= L["How many people are assisting the unit, for example if you put this on yourself it will show how many people are targeting your target. This includes you in the count!"],
+	["unit:situation"]			= L["Returns text based on the units general threat situation: Aggro for Aggro, High for being close to taking aggro, and Medium as a warning to be wary.|nThis cannot be used on target of target or focus target types of units."],
+	["situation"]				= L["Returns text based on your threat situation with your target: Aggro for Aggro, High for being close to taking aggro, and Medium as a general warning to be wary."],
+	["unit:color:sit"]			= L["Returns the color code for the units threat situation in general: Red for Aggro, Orange for High threat and Yellow to watch out.|nThis cannot be used on target of target or focus target types of units."],
+	["unit:color:aggro"]		= L["Same as [unit:color:sit] except it only returns red if the unit has aggro, rather than transiting from yellow -> orange -> red."],
+	["color:sit"]				= L["Returns a color code of the threat situation with your target: Red for Aggro, Orange for High threat and Yellow to be careful."],
+	["color:aggro"]				= L["Same as [color:sit] except it only returns red if you have aggro, rather than transiting from yellow -> orange -> red."],
+	["scaled:threat"]			= L["Returns a scaled threat percent of your aggro on your current target, always 0 - 100%."],
+	["general:sit"]				= L["Returns text based on your general threat situation on all units: Aggro for Aggro, High for being near to pulling aggro and Medium as a general warning."],
+	["color:gensit"]			= L["Returns a color code of your general threat situation on all units: Red for Aggro, Orange for High threat and Yellow to watch out."],
 }
 
 Tags.defaultNames = {
@@ -1140,9 +1235,6 @@ Tags.defaultNames = {
 	["incheal:name"]			= L["Incoming heal/Name"],
 	["abs:healabsorb"]			= L["Heal Absorb (Absolute)"],
 	["healabsorb"]				= L["Heal Absorb (Short)"],
-	["unit:scaled:threat"]		= L["Unit scaled threat"],
-	["unit:color:sit"]			= L["Unit colored situation"],
-	["unit:situation"]			= L["Unit situation name"],
 	["hp:color"]				= L["Health color"],
 	["guild"]					= L["Guild name"],
 	["druidform"]				= L["Druid form"],
@@ -1209,6 +1301,15 @@ Tags.defaultNames = {
 	["sec:absolutepp"]			= L["Cur/Max power (Secondary/Absolute)"],
 	["unit:raid:targeting"]		= L["Raid targeting unit"],
 	["unit:raid:assist"]		= L["Raid assisting unit"],
+	["unit:situation"]          = L["Unit situation name"],
+	["situation"]               = L["Threat situation"],
+	["unit:color:sit"]          = L["Unit colored situation"],
+	["unit:color:aggro"]        = L["Unit color code on aggro"],
+	["color:sit"]               = L["Color code for situation"],
+	["color:aggro"]				= L["Color code on aggro"],
+	["scaled:threat"]           = L["Scaled threat percent"],
+	["general:sit"]             = L["General threat situation"],
+	["color:gensit"]            = L["Color code for general situation"],
 }
 
 -- List of event types
@@ -1293,6 +1394,9 @@ local function loadAPIEvents()
 		["GetRaidRosterInfo"]		= "GROUP_ROSTER_UPDATE",
 		["GetReadyCheckStatus"]		= "READY_CHECK READY_CHECK_CONFIRM READY_CHECK_FINISHED",
 		["GetLootMethod"]			= "PARTY_LOOT_METHOD_CHANGED",
+		["GetThreatStatusColor"]	= "UNIT_THREAT_SITUATION_UPDATE",
+		["UnitThreatSituation"]		= "UNIT_THREAT_SITUATION_UPDATE",
+		["UnitDetailedThreatSituation"] = "UNIT_THREAT_SITUATION_UPDATE",
 	}
 end
 
@@ -1343,7 +1447,7 @@ end
 
 
 -- Checker function, makes sure tags are all happy
----@debug@
+---[===[@debug@
 function Tags:Verify()
 	local fine = true
 	for tag, events in pairs(self.defaultEvents) do
@@ -1388,4 +1492,4 @@ function Tags:Verify()
 		print("Verified tags, everything is fine.")
 	end
 end
----@end-debug@
+---@end-debug@]===]

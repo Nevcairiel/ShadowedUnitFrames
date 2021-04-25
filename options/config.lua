@@ -59,7 +59,7 @@ local INDICATOR_DESC = {
 		["role"] = L["Raid role indicator, adds a shield indicator for main tanks and a sword icon for main assists."], ["status"] = L["Status indicator, shows if the unit is currently in combat. For the player it will also show if you are rested."], ["class"] = L["Class icon for players."],
 		["happiness"] = L["Indicator for the current pet happiness."]
 }
-local TAG_GROUPS = {["classification"] = L["Classifications"], ["health"] = L["Health"], ["misc"] = L["Miscellaneous"], ["power"] = L["Power"], ["status"] = L["Status"], ["raid"] = L["Raid"], ["classspec"] = L["Class Specific"], ["classtimer"] = L["Class Timer"]}
+local TAG_GROUPS = {["classification"] = L["Classifications"], ["health"] = L["Health"], ["misc"] = L["Miscellaneous"], ["playerthreat"] = L["Player threat"], ["power"] = L["Power"], ["status"] = L["Status"], ["threat"] = L["Threat"], ["raid"] = L["Raid"], ["classspec"] = L["Class Specific"], ["classtimer"] = L["Class Timer"]}
 
 local pointPositions = {["BOTTOM"] = L["Bottom"], ["TOP"] = L["Top"], ["LEFT"] = L["Left"], ["RIGHT"] = L["Right"], ["TOPLEFT"] = L["Top Left"], ["TOPRIGHT"] = L["Top Right"], ["BOTTOMLEFT"] = L["Bottom Left"], ["BOTTOMRIGHT"] = L["Bottom Right"], ["CENTER"] = L["Center"]}
 local positionList = {["C"] = L["Center"], ["RT"] = L["Right Top"], ["RC"] = L["Right Center"], ["RB"] = L["Right Bottom"], ["LT"] = L["Left Top"], ["LC"] = L["Left Center"], ["LB"] = L["Left Bottom"], ["BL"] = L["Bottom Left"], ["BC"] = L["Bottom Center"], ["BR"] = L["Bottom Right"], ["TR"] = L["Top Right"], ["TC"] = L["Top Center"], ["TL"] = L["Top Left"]}
@@ -228,7 +228,7 @@ local function setVariable(unit, moduleKey, moduleSubKey, key, value)
 end
 
 local function specialRestricted(unit, moduleKey, moduleSubKey, key)
-	if( ShadowUF.fakeUnits[unit] and ( key == "colorDispel" or moduleKey == "castBar" or moduleKey == "incHeal" ) ) then
+	if( ShadowUF.fakeUnits[unit] and ( key == "colorDispel" or moduleKey == "castBar" or moduleKey == "incHeal" or key == "colorAggro" or key == "aggro" ) ) then
 		return true
 	elseif( moduleKey == "healthBar" and unit == "player" and key == "reaction" ) then
 		return true
@@ -312,7 +312,7 @@ local function hideRestrictedOption(info)
 	elseif( ( key == "incHeal" and not ShadowUF.modules.incHeal ) or ( key == "incAbsorb" and not ShadowUF.modules.incAbsorb ) or ( key == "healAbsorb" and not ShadowUF.modules.healAbsorb ) )  then
 		return true
 	-- Non-standard units do not support color by aggro or incoming heal
-	elseif( key == "colorDispel" ) then
+	elseif( key == "colorDispel" or key == "colorAggro" or key == "aggro" ) then
 		return string.match(unit, "%w+target" )
 	-- Fall back for indicators, no variable table so it shouldn't be shown
 	elseif( info[#(info) - 1] == "indicators" ) then
@@ -1032,6 +1032,13 @@ local function loadGeneralOptions()
 								name = L["Hostile"],
 								desc = L["Health bar color for hostile units."],
 								arg = "healthColors.hostile",
+							},
+							aggro = {
+								order = 6.5,
+								type = "color",
+								name = L["Has Aggro"],
+								desc = L["Health bar color for units with aggro."],
+								arg = "healthColors.aggro",
 							},
 							static = {
 								order = 7,
@@ -2546,6 +2553,14 @@ local function loadUnitOptions()
 								arg = "highlight.attention",
 								hidden = function(info) return info[2] == "target" end,
 							},
+							aggro = {
+								order = 5,
+								type = "toggle",
+								name = L["On aggro"],
+								desc = L["Highlight units that have aggro on any mob."],
+								arg = "highlight.aggro",
+								hidden = function(info) return ShadowUF.Units.zoneUnits[info[2]] or info[2] == "battlegroundpet" or info[2] == "arenapet" or ShadowUF.fakeUnits[info[2]] end,
+							},
 							debuff = {
 								order = 6,
 								type = "toggle",
@@ -3322,6 +3337,14 @@ local function loadUnitOptions()
 								type = "description",
 								name = "",
 								hidden = function(info) return not (info[2] == "player" or info[2] == "pet") end,
+							},
+							colorAggro = {
+								order = 4,
+								type = "toggle",
+								name = L["Color on aggro"],
+								desc = L["Changes the health bar to the set hostile color (Red by default) when the unit takes aggro."],
+								arg = "healthBar.colorAggro",
+								hidden = hideRestrictedOption,
 							},
 							colorDispel = {
 								order = 5,

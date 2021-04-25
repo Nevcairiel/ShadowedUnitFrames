@@ -74,6 +74,10 @@ function Highlight:OnEnable(frame)
 	frame.highlight.left:SetWidth(ShadowUF.db.profile.units[frame.unitType].highlight.size)
 	frame.highlight.right:SetWidth(ShadowUF.db.profile.units[frame.unitType].highlight.size)
 
+	if( ShadowUF.db.profile.units[frame.unitType].highlight.aggro ) then
+		frame:RegisterUnitEvent("UNIT_THREAT_SITUATION_UPDATE", self, "UpdateThreat")
+		frame:RegisterUpdateFunc(self, "UpdateThreat")
+	end
 
 	if( ShadowUF.db.profile.units[frame.unitType].highlight.attention and frame.unitType ~= "target" ) then
 		frame:RegisterNormalEvent("PLAYER_TARGET_CHANGED", self, "UpdateAttention")
@@ -110,6 +114,7 @@ function Highlight:OnDisable(frame)
 	frame:UnregisterAll(self)
 
 	frame.highlight.hasDebuff = nil
+	frame.highlight.hasThreat = nil
 	frame.highlight.hasAttention = nil
 	frame.highlight.hasMouseover = nil
 
@@ -128,6 +133,8 @@ function Highlight:Update(frame)
 	local color
 	if( frame.highlight.hasDebuff ) then
 		color = DebuffTypeColor[frame.highlight.hasDebuff] or DebuffTypeColor[""]
+	elseif( frame.highlight.hasThreat ) then
+		color = ShadowUF.db.profile.healthColors.hostile
 	elseif( frame.highlight.hasAttention ) then
 		color = goldColor
 	elseif( frame.highlight.hasMouseover ) then
@@ -147,6 +154,11 @@ function Highlight:Update(frame)
 	else
 		frame.highlight:Hide()
 	end
+end
+
+function Highlight:UpdateThreat(frame)
+	frame.highlight.hasThreat = UnitThreatSituation(frame.unit) == 3 or nil
+	self:Update(frame)
 end
 
 function Highlight:UpdateAttention(frame)
