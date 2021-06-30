@@ -71,32 +71,59 @@ local function runeMonitor(self, elapsed)
 	end
 end
 
+local function compareRuneInfo(a, b)
+	return a.startTime + a.cooldown < b.startTime + b.cooldown
+end
+
+local function getRunesInfoSorted()
+	local runesInfoTable = {}
+
+	for runeIndex=1, 6 do
+		local startTime, cooldown, cooled = GetRuneCooldown(runeIndex)
+		runesInfoTable[runeIndex] = {startTime = startTime, cooldown = cooldown, cooled = cooled}
+	end
+
+	table.sort(runesInfoTable, compareRuneInfo)
+
+	return runesInfoTable
+end
+
+local function updateAllRunes(frame, runesInfoTable)
+	for runeIndex=1, 6 do
+		local startTime = runesInfoTable[runeIndex].startTime
+		local cooldown = runesInfoTable[runeIndex].cooldown
+		local cooled = runesInfoTable[runeIndex].cooled
+
+		local rune = frame.runeBar.runes[runeIndex]
+
+		-- Blizzard changed something with this API apparently and now it can be true/false/nil
+		if( cooled == nil ) then return end
+
+		if( not cooled ) then
+			rune.endTime = startTime + cooldown
+			rune:SetMinMaxValues(startTime, rune.endTime)
+			rune:SetValue(GetTime())
+			rune:SetAlpha(0.40)
+			rune:SetScript("OnUpdate", runeMonitor)
+		else
+			rune:SetMinMaxValues(0, 1)
+			rune:SetValue(1)
+			rune:SetAlpha(1.0)
+			rune:SetScript("OnUpdate", nil)
+			rune.endTime = nil
+		end
+
+		if( rune.fontString ) then
+			rune.fontString:UpdateTags()
+		end
+	end
+end
+
 -- Updates the timers on runes
 function Runes:UpdateUsable(frame, event, id, usable)
 	if( not id or not frame.runeBar.runes[id] ) then
 		return
 	end
 
-	local rune = frame.runeBar.runes[id]
-	local startTime, cooldown, cooled = GetRuneCooldown(id)
-	-- Blizzard changed something with this API apparently and now it can be true/false/nil
-	if( cooled == nil ) then return end
-
-	if( not cooled ) then
-		rune.endTime = startTime + cooldown
-		rune:SetMinMaxValues(startTime, rune.endTime)
-		rune:SetValue(GetTime())
-		rune:SetAlpha(0.40)
-		rune:SetScript("OnUpdate", runeMonitor)
-	else
-		rune:SetMinMaxValues(0, 1)
-		rune:SetValue(1)
-		rune:SetAlpha(1.0)
-		rune:SetScript("OnUpdate", nil)
-		rune.endTime = nil
-	end
-
-	if( rune.fontString ) then
-		rune.fontString:UpdateTags()
-	end
+	updateAllRunes(frame, getRunesInfoSorted())
 end
