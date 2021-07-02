@@ -3671,17 +3671,17 @@ local function loadUnitOptions()
 								order = 1,
 								type = "toggle",
 								name = L["Hide in >5-man raids"],
-								desc = L["Party frames are hidden while in a raid group with more than 5 people inside."],
-								hidden = function(info) return info[2] ~= "party" end,
+								desc = L["Frames are hidden while in a raid group with more than 5 people inside."],
+								hidden = function(info) return info[2] ~= "party" and info[2] ~= "raid" end,
 								set = function(info, value)
 									if( value ) then
 										setVariable(info[2], nil, nil, "hideAnyRaid", false)
 									end
 
-									setVariable(info[2], nil, nil, "hideSemiRaid", value)
+									setVariable(info[2], nil, nil, "hideSemiRaidParty", value)
 									ShadowUF.Units:ReloadHeader(info[#(info) - 3])
 								end,
-								arg = "hideSemiRaid",
+								arg = "hideSemiRaidParty",
 							},
 							hideRaid = {
 								order = 2,
@@ -3691,7 +3691,8 @@ local function loadUnitOptions()
 								hidden = function(info) return info[2] ~= "party" end,
 								set = function(info, value)
 									if( value ) then
-										setVariable(info[2], nil, nil, "hideSemiRaid", false)
+										setVariable(info[2], nil, nil, "hideSemiRaidParty", false)
+										setVariable(info[2], nil, nil, "hideSemiRaidRaid", false)
 									end
 
 									setVariable(info[2], nil, nil, "hideAnyRaid", value)
@@ -3714,10 +3715,10 @@ local function loadUnitOptions()
 								desc = L["Raid frames are hidden while in a raid group with 5 or less people inside."],
 								hidden = function(info) return info[2] ~= "raid" end,
 								set = function(info, value)
-									setVariable(info[2], nil, nil, "hideSemiRaid", value)
+									setVariable(info[2], nil, nil, "hideSemiRaidRaid", value)
 									ShadowUF.Units:ReloadHeader(info[#(info) - 3])
 								end,
-								arg = "hideSemiRaid"
+								arg = "hideSemiRaidRaid"
 							},
 							showInRaid = {
 								order = 4,

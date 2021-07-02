@@ -916,7 +916,8 @@ function Units:SetHeaderAttributes(frame, type)
 
 		self:CheckGroupVisibility()
 		if( stateMonitor.party ) then
-			stateMonitor.party:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.party.hideSemiRaid)
+			stateMonitor.party:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.party.hideSemiRaidParty)
+			stateMonitor.party:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.party.hideSemiRaidRaid)
 			stateMonitor.party:SetAttribute("hideAnyRaid", ShadowUF.db.profile.units.party.hideAnyRaid)
 		end
 	end
@@ -925,7 +926,8 @@ function Units:SetHeaderAttributes(frame, type)
 		self:CheckGroupVisibility()
 
 		for id, monitor in pairs(stateMonitor.raids) do
-			monitor:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.raid.hideSemiRaid)
+			monitor:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.raid.hideSemiRaidParty)
+			monitor:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.raid.hideSemiRaidRaid)
 		end
 	end
 
@@ -974,19 +976,24 @@ local function setupRaidStateMonitor(id, headerFrame)
 	stateMonitor.raids[id] = CreateFrame("Frame", nil, nil, "SecureHandlerBaseTemplate")
 	stateMonitor.raids[id]:SetAttribute("raidDisabled", nil)
 	stateMonitor.raids[id]:SetFrameRef("raidHeader", headerFrame)
-	stateMonitor.raids[id]:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.raid.hideSemiRaid)
+	stateMonitor.raids[id]:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.raid.hideSemiRaidRaid)
+	stateMonitor.raids[id]:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.raid.hideSemiRaidParty)
 	stateMonitor.raids[id]:WrapScript(stateMonitor.raids[id], "OnAttributeChanged", [[
-		if( name ~= "state-raidmonitor" and name ~= "raiddisabled" and name ~= "hidesemiraid" ) then
+		if( name ~= "state-raidmonitor" and name ~= "raiddisabled" and name ~= "hidesemiraidraid" and name ~= "hidesemiraidparty" ) then
 			return
 		end
 
 		local header = self:GetFrameRef("raidHeader")
 		if( self:GetAttribute("raidDisabled") ) then
-			if( header:IsVisible() ) then header:Hide() end
+			if( header:IsVisible() ) then
+				header:Hide()
+			end
 			return
 		end
 
-		if( self:GetAttribute("hideSemiRaid") and self:GetAttribute("state-raidmonitor") ~= "raid6" ) then
+		if( self:GetAttribute("hideSemiRaidParty") and self:GetAttribute("state-raidmonitor") == "raid6" ) then
+			header:Hide()
+		elseif( self:GetAttribute("hideSemiRaidRaid") and self:GetAttribute("state-raidmonitor") ~= "raid6" ) then
 			header:Hide()
 		else
 			header:Show()
@@ -997,11 +1004,14 @@ local function setupRaidStateMonitor(id, headerFrame)
 end
 
 function Units:LoadSplitGroupHeader(type)
-	if( headerFrames.raid ) then headerFrames.raid:Hide() end
+	if( headerFrames.raid ) then
+		headerFrames.raid:Hide()
+	end
 	headerFrames.raidParent = nil
 
 	for id, monitor in pairs(stateMonitor.raids) do
-		monitor:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.raid.hideSemiRaid)
+		monitor:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.raid.hideSemiRaidRaid)
+		monitor:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.raid.hideSemiRaidParty)
 		monitor:SetAttribute("raidDisabled", id == -1 and true or nil)
 		monitor:SetAttribute("recheck", time())
 	end
@@ -1071,7 +1081,8 @@ function Units:LoadGroupHeader(type)
 
 		if( type == "raid" ) then
 			for id, monitor in pairs(stateMonitor.raids) do
-				monitor:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.raid.hideSemiRaid)
+				monitor:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.raid.hideSemiRaidRaid)
+				monitor:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.raid.hideSemiRaidParty)
 				monitor:SetAttribute("raidDisabled", id >= 0 and true or nil)
 			end
 		end
@@ -1121,15 +1132,18 @@ function Units:LoadGroupHeader(type)
 		stateMonitor.party = CreateFrame("Frame", nil, nil, "SecureHandlerBaseTemplate")
 		stateMonitor.party:SetAttribute("partyDisabled", nil)
 		stateMonitor.party:SetFrameRef("partyHeader", headerFrame)
-		stateMonitor.party:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.party.hideSemiRaid)
+		stateMonitor.party:SetAttribute("hideSemiRaidRaid", ShadowUF.db.profile.units.party.hideSemiRaidRaid)
+		stateMonitor.party:SetAttribute("hideSemiRaidParty", ShadowUF.db.profile.units.party.hideSemiRaidParty)
 		stateMonitor.party:SetAttribute("hideAnyRaid", ShadowUF.db.profile.units.party.hideAnyRaid)
 		stateMonitor.party:WrapScript(stateMonitor.party, "OnAttributeChanged", [[
-			if( name ~= "state-raidmonitor" and name ~= "partydisabled" and name ~= "hideanyraid" and name ~= "hidesemiraid" ) then return end
+			if( name ~= "state-raidmonitor" and name ~= "partydisabled" and name ~= "hideanyraid" and name ~= "hidesemiraidparty" and name ~= "hidesemiraidraid" ) then return end
 			if( self:GetAttribute("partyDisabled") ) then return end
 
 			if( self:GetAttribute("hideAnyRaid") and ( self:GetAttribute("state-raidmonitor") == "raid1" or self:GetAttribute("state-raidmonitor") == "raid6" ) ) then
 				self:GetFrameRef("partyHeader"):Hide()
-			elseif( self:GetAttribute("hideSemiRaid") and self:GetAttribute("state-raidmonitor") == "raid6" ) then
+			elseif( self:GetAttribute("hideSemiRaidParty") and self:GetAttribute("state-raidmonitor") == "raid6" ) then
+				self:GetFrameRef("partyHeader"):Hide()
+			elseif( self:GetAttribute("hideSemiRaidRaid") and self:GetAttribute("state-raidmonitor") == "raid6" ) then
 				self:GetFrameRef("partyHeader"):Hide()
 			else
 				self:GetFrameRef("partyHeader"):Show()
