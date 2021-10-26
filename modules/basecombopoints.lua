@@ -176,7 +176,7 @@ function Combo:Update(frame, event, unit, powerType)
 	-- Anything power based will have an eventType to filter on
 	if( event and frame[key].cpConfig.eventType and frame[key].cpConfig.eventType ~= powerType ) then return end
 
-	local points = self:GetPoints(unit)
+	local points = self:GetPoints(unit, frame)
 
 	-- Bar display, hide it if we don't have any combo points
 	if( ShadowUF.db.profile.units[frame.unitType][key].isBar ) then
