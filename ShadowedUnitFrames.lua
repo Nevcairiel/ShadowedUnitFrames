@@ -351,6 +351,7 @@ function ShadowUF:LoadUnitDefaults()
 	self.defaults.profile.units.player.healthBar.predicted = true
 	self.defaults.profile.units.player.powerBar.predicted = true
 	self.defaults.profile.units.player.indicators.status.enabled = true
+	self.defaults.profile.units.player.runeBar = {enabled = false}
 	self.defaults.profile.units.player.totemBar = {enabled = false}
 	self.defaults.profile.units.player.druidBar = {enabled = false}
 	self.defaults.profile.units.player.xpBar = {enabled = false}

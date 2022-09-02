@@ -65,6 +65,7 @@ modules\combopoints.lua
 modules\range.lua
 modules\empty.lua
 modules\druid.lua
+modules\runes.lua
 #@do-not-package@
 options\config.lua
 #@end-do-not-package@

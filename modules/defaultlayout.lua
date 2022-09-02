@@ -145,6 +145,10 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 		FOCUS = {r = 1.0, g = 0.50, b = 0.25},
 		ENERGY = {r = 1.0, g = 0.85, b = 0.10},
 		RUNES = {r = 0.50, g = 0.50, b = 0.50},
+		RUNES_BLOOD = {r = 0.95, g = 0.0, b = 0.08},
+		RUNES_FROST = {r = 0.0, g = 0.85, b = 1.0},
+		RUNES_UNHOLY = {r = 0.0, g = 1.0, b = 0.35},
+		RUNES_DEATH = {r = 0.69, g = 0.15, b = 1.0},
 		RUNIC_POWER = {b = 0.60, g = 0.45, r = 0.35},
 		AMMOSLOT = {r = 0.85, g = 0.60, b = 0.55},
 		FUEL = {r = 0.85, g = 0.47, b = 0.36},
@@ -331,6 +335,7 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 			castBar = {order = 60},
 			xpBar = {order = 55},
 			fader = {enabled = false, combatAlpha = 1.0, inactiveAlpha = 0.6},
+			runeBar = {enabled = true, background = false, height = 0.40, order = 70},
 			totemBar = {enabled = true, background = false, height = 0.40, order = 70},
 			druidBar = {enabled = true, background = true, height = 0.40, order = 70},
 			comboPoints = {enabled = true, anchorTo = "$parent", order = 60, anchorPoint = "BR", x = -3, y = 8, size = 14, spacing = -4, growth = "LEFT", isBar = true, height = 0.40},
@@ -347,7 +352,8 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 				{text = "[perpp]"},
 				{text = "[curmaxpp]"},
 				{text = "[(()afk() )][name][( ()group())]"},
-				{text = ""}
+				{text = ""},
+				{enabled = true, width = 1, name = L["Timer Text"], text = "[rune:timer]", anchorTo = "$runeBar", anchorPoint = "C", size = 0, x = 0, y = 0, default = true, block = true},
 			},
 		},
 		party = {
