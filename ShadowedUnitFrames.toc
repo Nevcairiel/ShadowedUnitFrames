@@ -6,15 +6,7 @@
 ## Version: @project-version@
 ## SavedVariables: ShadowedUFDB
 ## X-Website: https://www.wowace.com/addons/shadowed-unit-frames/
-#@version-bcc@
-## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSpellRange-1.0, Clique
-#@end-version-bcc@
-#@version-wrath@
-## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSpellRange-1.0, Clique
-#@end-version-wrath@
-#@non-version-bcc@
-# ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSpellRange-1.0, LibClassicDurations, Clique, LibClassicCasterino
-#@end-non-version-bcc@
+## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSpellRange-1.0, UTF8, Clique, LibClassicDurations, LibClassicCasterino
 ## X-Curse-Project-ID: 19268
 ## X-WoWI-ID: 13494
 
@@ -28,6 +20,7 @@ libs\LibSpellRange-1.0\lib.xml
 libs\LibClassicDurations\LibClassicDurations.xml
 libs\LibClassicCasterino\LibClassicCasterino.lua
 #@end-version-classic@
+libs\UTF8\utf8.lua
 #@end-no-lib-strip@
 
 localization\enUS.lua

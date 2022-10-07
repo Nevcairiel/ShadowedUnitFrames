@@ -32,6 +32,7 @@ read_globals = {
 	"CopyTable",
 	"string.split",
 	"string.trim",
+	"string.utf8sub",
 	"table.wipe",
 	"time",
 
