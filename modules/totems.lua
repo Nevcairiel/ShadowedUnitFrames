@@ -44,6 +44,7 @@ function Totems:OnEnable(frame)
 	end
 
 	frame:RegisterNormalEvent("PLAYER_TOTEM_UPDATE", self, "Update")
+	frame:RegisterUpdateFunc(self, "UpdateVisibility")
 	frame:RegisterUpdateFunc(self, "Update")
 end
 
@@ -107,13 +108,25 @@ local function totemMonitor(self, elapsed)
 		self:SetScript("OnUpdate", nil)
 		self.endTime = nil
 
-		if( MAX_TOTEMS == 1 ) then
+		if( not self.parent.inVehicle and MAX_TOTEMS == 1 ) then
 			ShadowUF.Layout:SetBarVisibility(self.parent, "totemBar", false)
 		end
 	end
 
 	if( self.fontString ) then
 		self.fontString:UpdateTags()
+	end
+end
+
+function Totems:UpdateVisibility(frame)
+	if( frame.totemBar.inVehicle ~= frame.inVehicle ) then
+		frame.totemBar.inVehicle = frame.inVehicle
+
+		if( frame.inVehicle ) then
+			ShadowUF.Layout:SetBarVisibility(frame, "totemBar", false)
+		elseif( MAX_TOTEMS ~= 1 ) then
+			self:Update(frame)
+		end
 	end
 end
 
