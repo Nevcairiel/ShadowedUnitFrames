@@ -5,6 +5,9 @@
 ShadowUF = select(2, ...)
 
 local L = ShadowUF.L
+
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF.dbRevision = 61
 ShadowUF.dbRevisionClassic = 5
 ShadowUF.playerUnit = "player"
@@ -762,10 +765,12 @@ function ShadowUF:HideBlizzardFrames()
 
 		-- We keep these in case someone is still using the default auras, otherwise it messes up vehicle stuff
 		PlayerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-		PlayerFrame:RegisterEvent("UNIT_ENTERING_VEHICLE")
-		PlayerFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
-		PlayerFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
-		PlayerFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+		if WoWWrath then
+			PlayerFrame:RegisterEvent("UNIT_ENTERING_VEHICLE")
+			PlayerFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
+			PlayerFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
+			PlayerFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+		end
 		PlayerFrame:SetMovable(true)
 		PlayerFrame:SetUserPlaced(true)
 		PlayerFrame:SetDontSavePosition(true)

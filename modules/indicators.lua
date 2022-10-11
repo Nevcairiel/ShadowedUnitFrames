@@ -1,5 +1,7 @@
 local Indicators = {list = {"status", "pvp", "leader", "resurrect", "masterLoot", "raidTarget", "ready", "role", "class", "phase", "happiness" }}
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF:RegisterModule(Indicators, "indicators", ShadowUF.L["Indicators"])
 
 function Indicators:UpdateClass(frame)
@@ -265,7 +267,9 @@ function Indicators:OnEnable(frame)
 		frame.indicators.parent = frame
 
 		if( frame.unitType == "player" ) then
-			frame:RegisterUpdateFunc(self, "CheckVehicle")
+			if WoWWrath then
+				frame:RegisterUpdateFunc(self, "CheckVehicle")
+			end
 			frame:RegisterNormalEvent("PLAYER_REGEN_ENABLED", self, "UpdateStatus")
 			frame:RegisterNormalEvent("PLAYER_REGEN_DISABLED", self, "UpdateStatus")
 			frame:RegisterNormalEvent("PLAYER_UPDATE_RESTING", self, "UpdateStatus")

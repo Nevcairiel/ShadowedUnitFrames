@@ -2,6 +2,8 @@ local Totems = {}
 local totemColors = {}
 local MAX_TOTEMS = MAX_TOTEMS
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 -- Death Knights untalented ghouls are guardians and are considered totems........... so set it up for them
 local playerClass = select(2, UnitClass("player"))
 ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Totem bar"], true, "SHAMAN")
@@ -44,7 +46,9 @@ function Totems:OnEnable(frame)
 	end
 
 	frame:RegisterNormalEvent("PLAYER_TOTEM_UPDATE", self, "Update")
-	frame:RegisterUpdateFunc(self, "UpdateVisibility")
+	if WoWWrath then
+		frame:RegisterUpdateFunc(self, "UpdateVisibility")
+	end
 	frame:RegisterUpdateFunc(self, "Update")
 end
 

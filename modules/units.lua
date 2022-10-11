@@ -11,6 +11,8 @@ local unitFrames, headerFrames, frameList, unitEvents, childUnits, headerUnits, 
 local remappedUnits = Units.remappedUnits
 local _G = getfenv(0)
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF.Units = Units
 ShadowUF:RegisterModule(Units, "units")
 
@@ -463,7 +465,7 @@ OnAttributeChanged = function(self, name, unit)
 	end
 
 	-- Handles switching the internal unit variable to that of their vehicle
-	if( self.unit == "player" or self.unitRealType == "party" or self.unitRealType == "raid" ) then
+	if( WoWWrath and self.unit == "player" or self.unitRealType == "party" or self.unitRealType == "raid" ) then
 		self:RegisterNormalEvent("UNIT_ENTERED_VEHICLE", Units, "CheckVehicleStatus")
 		self:RegisterNormalEvent("UNIT_EXITED_VEHICLE", Units, "CheckVehicleStatus")
 		self:RegisterUpdateFunc(Units, "CheckVehicleStatus")
@@ -478,32 +480,34 @@ OnAttributeChanged = function(self, name, unit)
 		self:SetAttribute("unitRealOwner", self.unitRealOwner)
 		self:RegisterNormalEvent("UNIT_PET", Units, "CheckPetUnitUpdated")
 
-		if( self.unit == "pet" ) then
-			self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.player.disableVehicle)
-		else
-			self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.party.disableVehicle)
-		end
-
-		-- Logged out in a vehicle
-		if( UnitHasVehicleUI(self.unitRealOwner) and UnitHasVehiclePlayerFrameUI(self.unitRealOwner) ) then
-			self:SetAttribute("unitIsVehicle", true)
-		end
-
-		-- Hide any pet that became a vehicle, we detect this by the owner being untargetable but they have a pet out
-		stateMonitor:WrapScript(self, "OnAttributeChanged", [[
-			if( name == "state-vehicleupdated" ) then
-				self:SetAttribute("unitIsVehicle", UnitHasVehicleUI(self:GetAttribute("unitRealOwner")) and value == "vehicle" and true or false)
-			elseif( name == "disablevehicleswap" or name == "state-unitexists" or name == "unitisvehicle" ) then
-				-- Unit does not exist, OR unit is a vehicle and vehicle swap is not disabled, hide frame
-				if( not self:GetAttribute("state-unitexists") or ( self:GetAttribute("unitIsVehicle") and not self:GetAttribute("disableVehicleSwap") ) ) then
-					self:Hide()
-				-- Unit exists, show it
-				else
-					self:Show()
-				end
+		if WoWWrath then
+			if( self.unit == "pet" ) then
+				self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.player.disableVehicle)
+			else
+				self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.party.disableVehicle)
 			end
-		]])
-		RegisterStateDriver(self, "vehicleupdated", string.format("[target=%s, nohelp, noharm] vehicle; pet", self.unitRealOwner, self.unit))
+
+			-- Logged out in a vehicle
+			if( UnitHasVehicleUI(self.unitRealOwner) and UnitHasVehiclePlayerFrameUI(self.unitRealOwner) ) then
+				self:SetAttribute("unitIsVehicle", true)
+			end
+
+			-- Hide any pet that became a vehicle, we detect this by the owner being untargetable but they have a pet out
+			stateMonitor:WrapScript(self, "OnAttributeChanged", [[
+				if( name == "state-vehicleupdated" ) then
+					self:SetAttribute("unitIsVehicle", UnitHasVehicleUI(self:GetAttribute("unitRealOwner")) and value == "vehicle" and true or false)
+				elseif( name == "disablevehicleswap" or name == "state-unitexists" or name == "unitisvehicle" ) then
+					-- Unit does not exist, OR unit is a vehicle and vehicle swap is not disabled, hide frame
+					if( not self:GetAttribute("state-unitexists") or ( self:GetAttribute("unitIsVehicle") and not self:GetAttribute("disableVehicleSwap") ) ) then
+						self:Hide()
+						-- Unit exists, show it
+					else
+						self:Show()
+					end
+				end
+			]])
+			RegisterStateDriver(self, "vehicleupdated", string.format("[target=%s, nohelp, noharm] vehicle; pet", self.unitRealOwner, self.unit))
+		end
 
 	-- Automatically do a full update on target change
 	elseif( self.unit == "target" ) then

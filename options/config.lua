@@ -4,6 +4,8 @@ local playerClass = select(2, UnitClass("player"))
 local modifyUnits, globalConfig = {}, {}
 local L = ShadowUF.L
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF.Config = Config
 
 --[[
@@ -2463,7 +2465,7 @@ local function loadUnitOptions()
 				set = setUnit,
 				get = getUnit,
 				args = {
-					vehicle = {
+					vehicle = WoWWrath and {
 						order = 1,
 						type = "group",
 						inline = true,
@@ -2499,7 +2501,7 @@ local function loadUnitOptions()
 								arg = "disableVehicle",
 							},
 						},
-					},
+					} or nil,
 					portrait = {
 						order = 2,
 						type = "group",
