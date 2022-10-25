@@ -947,7 +947,7 @@ local function loadGeneralOptions()
 								set = setColor,
 								get = function(info)
 									if( not ShadowUF.db.profile.bars.backgroundColor ) then
-										return {r = 0, g = 0, b = 0}
+										return 0, 0, 0
 									end
 
 									return getColor(info)
