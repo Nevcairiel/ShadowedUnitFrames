@@ -245,7 +245,9 @@ end
 local function fadeReadyStatus(self, elapsed)
 	self.timeLeft = self.timeLeft - elapsed
 	local a = self.timeLeft / self.startTime
-	self.ready:SetAlpha(a)
+	if( a > 0 ) then 
+		self.ready:SetAlpha(a)
+	end
 
 	if( self.timeLeft <= 0 ) then
 		self:SetScript("OnUpdate", nil)
@@ -275,7 +277,9 @@ function Indicators:UpdateReadyCheck(frame, event)
 
 					f.fadeList[fadeFrame] = timeLeft - elapsed
 					local a = f.fadeList[fadeFrame] / FADEOUT_TIME
-					fadeFrame:SetAlpha(a)
+					if( a > 0 ) then 
+						fadeFrame:SetAlpha(a)
+					end
 
 					if( f.fadeList[fadeFrame] <= 0 ) then
 						f.fadeList[fadeFrame] = nil
