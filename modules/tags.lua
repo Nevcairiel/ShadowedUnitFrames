@@ -790,6 +790,29 @@ Tags.defaultTags = {
 
 		return string.format("%d%%", math.floor(UnitPower(unit) / maxPower * 100 + 0.5))
 	end]],
+	["smartpower"] = [[function(unit, unitOwner)
+		local shouldHide = UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)
+		if (shouldHide) then
+			return nil
+		end
+		
+		local maxPower = UnitPowerMax(unit)
+		if (maxPower <= 0) then
+			return 0
+		end
+
+		local unitUsesMana = UnitPowerType(unit) == Enum.PowerType.Mana
+		local currentPower = UnitPower(unit)
+
+		-- Show % for mana users
+		if (unitUsesMana) then
+			local powerPercent = math.floor(currentPower / maxPower * 100 + 0.5)
+			return string.format("%d%%", powerPercent)
+		-- Show actual value for non-Mana users
+		else
+			return ShadowUF:FormatLargeNumber(currentPower)
+		end
+	end]],
 	["plus"] = [[function(unit, unitOwner) local classif = UnitClassification(unit) return (classif == "elite" or classif == "rareelite") and "+" end]],
 	["race"] = [[function(unit, unitOwner) return UnitRace(unit) end]],
 	["rare"] = [[function(unit, unitOwner) local classif = UnitClassification(unit) return (classif == "rare" or classif == "rareelite") and ShadowUF.L["Rare"] end]],
@@ -1120,6 +1143,7 @@ Tags.defaultEvents = {
 	["colorname"]				= "UNIT_NAME_UPDATE",
 	["perhp"]               	= "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION",
 	["perpp"]               	= "SUF_POWERTYPE:CURRENT UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_CONNECTION",
+	["smartpower"]          	= "UNIT_CONNECTION UNIT_HEALTH UNIT_DISPLAYPOWER UNIT_MAXPOWER UNIT_POWER_FREQUENT",
 	["status"]              	= "UNIT_HEALTH PLAYER_UPDATE_RESTING UNIT_CONNECTION",
 	["smartlevel"]          	= "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED",
 	["cpoints"]             	= "UNIT_POWER_FREQUENT PLAYER_TARGET_CHANGED",
@@ -1195,6 +1219,7 @@ Tags.defaultCategories = {
 	["server"]					= "misc",
 	["perhp"]					= "health",
 	["perpp"]					= "power",
+	["smartpower"]				= "power",
 	["class"]					= "classification",
 	["classcolor"]				= "classification",
 	["creature"]				= "classification",
@@ -1291,6 +1316,7 @@ Tags.defaultHelp = {
 	["server"]					= L["Unit server, if they are from your server then nothing is shown."],
 	["perhp"]					= L["Returns current health as a percentage, if the unit is dead or offline than that is shown instead."],
 	["perpp"]					= L["Returns current power as a percentage."],
+	["smartpower"]				= L["If the unit uses mana show percentage, otherwise show value."],
 	["class"]					= L["Class name without coloring, use [classcolor][class][close] if you want the class name to be colored by class."],
 	["classcolor"]				= L["Color code for the class, use [classcolor][class][close] if you want the class text to be colored by class"],
 	["creature"]				= L["Creature type, returns Felguard if the unit is a Felguard, Wolf if it's a Wolf and so on."],
@@ -1386,6 +1412,7 @@ Tags.defaultNames = {
 	["server"]					= L["Unit server"],
 	["perhp"]					= L["Percent HP"],
 	["perpp"]					= L["Percent power"],
+	["smartpower"]				= L["Smart power"],
 	["class"]					= L["Class"],
 	["classcolor"]				= L["Class color tag"],
 	["creature"]				= L["Creature type"],
