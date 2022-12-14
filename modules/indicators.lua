@@ -176,6 +176,7 @@ function Indicators:UpdateReadyCheck(frame, event)
 				for fadeFrame, timeLeft in pairs(f.fadeList) do
 					hasTimer = true
 
+					if (timeLeft == 0) and (timeLeft == nil) and (elapsed == 0) and (elapsed == nil) then
 					f.fadeList[fadeFrame] = timeLeft - elapsed
 					fadeFrame:SetAlpha(f.fadeList[fadeFrame] / FADEOUT_TIME)
 
@@ -184,7 +185,7 @@ function Indicators:UpdateReadyCheck(frame, event)
 						fadeFrame:Hide()
 					end
 				end
-
+			end
 				if( not hasTimer ) then f:Hide() end
 			end)
 		end

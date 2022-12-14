@@ -475,7 +475,7 @@ function Layout:SetupText(frame, config)
 	-- Now set all of the width using our weightings
 	for _, fontString in pairs(frame.fontStrings) do
 		local id = fontString.configID
-		if( fontString:IsShown() ) then
+		if( fontString:IsShown() ) and (fontString.availableWidth == 0) then
 			fontString:SetWidth(fontString.availableWidth * (config.text[id].width / totalWeight[fontString.widthID]))
 			fontString:SetHeight(ShadowUF.db.profile.font.size + 1)
 
