@@ -465,7 +465,7 @@ OnAttributeChanged = function(self, name, unit)
 	end
 
 	-- Handles switching the internal unit variable to that of their vehicle
-	if( WoWWrath and self.unit == "player" or self.unitRealType == "party" or self.unitRealType == "raid" ) then
+	if( WoWWrath and ( self.unit == "player" or self.unitRealType == "party" or self.unitRealType == "raid" ) ) then
 		self:RegisterNormalEvent("UNIT_ENTERED_VEHICLE", Units, "CheckVehicleStatus")
 		self:RegisterNormalEvent("UNIT_EXITED_VEHICLE", Units, "CheckVehicleStatus")
 		self:RegisterUpdateFunc(Units, "CheckVehicleStatus")
