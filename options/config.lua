@@ -6527,7 +6527,7 @@ local function loadAuraIndicatorsOptions()
 			if( not aura ) then	return auraMap[info[#(info)]] end
 
 			local name, _, icon = GetSpellInfo(aura)
-			if( not name ) then return name end
+			if( not name ) then return string.format("Unknown (#%i)", aura) end
 
 			return "|T" .. icon .. ":18:18:0:0|t " .. name
 		end,
