@@ -6,7 +6,7 @@ ShadowUF = select(2, ...)
 
 local L = ShadowUF.L
 ShadowUF.dbRevision = 61
-ShadowUF.dbRevisionClassic = 5
+ShadowUF.dbRevisionClassic = 6
 ShadowUF.playerUnit = "player"
 ShadowUF.enabledUnits = {}
 ShadowUF.modules = {}
@@ -118,6 +118,9 @@ end
 function ShadowUF:CheckUpgrade()
 	local revisionClassic = self.db.profile.revisionClassic or (self.db.profile.revision and 1 or self.dbRevisionClassic)
 	local revision = self.db.profile.revision or self.dbRevision
+	if( revisionClassic <= 5 ) then
+		self.db.profile.healthColors.aggro = {r = 0.9, g = 0, b = 0}
+	end
 	if( revisionClassic <= 4 ) then
 		-- new resources
 		self.db.profile.powerColors.RUNES_BLOOD = {r = 0.95, g = 0.0, b = 0.08}

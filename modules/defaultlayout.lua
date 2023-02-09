@@ -184,7 +184,8 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 		hostile = {r = 0.90, g = 0.0, b = 0.0},
 		friendly = {r = 0.20, g = 0.90, b = 0.20},
 		neutral = {r = 0.93, g = 0.93, b = 0.0},
-		offline = {r = 0.50, g = 0.50, b = 0.50}
+		offline = {r = 0.50, g = 0.50, b = 0.50},
+		aggro = {r = 0.9, g = 0, b = 0}
 	}
 	config.castColors = {
 		channel = {r = 0.25, g = 0.25, b = 1.0},
