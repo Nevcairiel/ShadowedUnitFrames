@@ -6744,6 +6744,7 @@ local function loadAuraIndicatorsOptions()
 		order = 1,
 		type = "group",
 		name = function(info)
+			if( not LOCALIZED_CLASS_NAMES_MALE[info[#(info)]] ) then return info[#(info)] end
 			return ShadowUF:Hex(ShadowUF.db.profile.classColors[info[#(info)]]) .. LOCALIZED_CLASS_NAMES_MALE[info[#(info)]] .. "|r"
 		end,
 		args = {},
