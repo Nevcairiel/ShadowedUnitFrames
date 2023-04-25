@@ -779,6 +779,23 @@ local function loadGeneralOptions()
 								arg = "bars.spacing",
 								hidden = hideAdvancedOption,
 							},
+							sep3 = {
+								order = 7.5,
+								type = "description",
+								name = "",
+								width = "full",
+								hidden = hideAdvancedOption,
+							},
+							strata = {
+								order = 8,
+								type = "select",
+								name = L["Unit frame strata"],
+								desc = L["The frame strata to put unit frames in. You will need to do a /console reloadui for this change to take effect."],
+								values = {["BACKGROUND"] = L["Background"], ["LOW"] = L["Low"], ["MEDIUM"] = L["Medium"], ["HIGH"] = L["High"]},
+								sorting = {"BACKGROUND", "LOW", "MEDIUM", "HIGH"},
+								arg = "unitStrata",
+								hidden = hideAdvancedOption,
+							},
 						},
 					},
 					backdrop = {

@@ -34,6 +34,7 @@ function ShadowUF:OnInitialize()
 			tooltipCombat = false,
 			omnicc = false,
 			blizzardcc = true,
+			unitStrata = "HIGH",
 			tags = {},
 			units = {},
 			positions = {},
