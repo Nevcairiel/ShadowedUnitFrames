@@ -774,7 +774,12 @@ function ShadowUF:HideBlizzardFrames()
 	end
 
 	if( self.db.profile.hidden.playerPower and not active_hiddens.playerPower ) then
-		basicHideBlizzardFrames(PriestBarFrame, RuneFrame, WarlockPowerFrame, MonkHarmonyBarFrame, PaladinPowerBarFrame, MageArcaneChargesFrame)
+		local powerBarFrames = {"PriestBarFrame", "RuneFrame", "WarlockPowerFrame", "MonkHarmonyBarFrame", "PaladinPowerBarFrame", "MageArcaneChargesFrame"}
+		for _, frame in pairs(powerBarFrames) do
+			if _G[frame] then
+				basicHideBlizzardFrames(_G[frame])
+			end
+		end
 	end
 
 	if( self.db.profile.hidden.pet and not active_hiddens.pet ) then
