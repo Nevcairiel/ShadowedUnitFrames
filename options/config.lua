@@ -1429,7 +1429,7 @@ local function loadGeneralOptions()
 		arg = "classColors.$key",
 	}
 
-	for classToken in pairs(RAID_CLASS_COLORS) do
+	for classToken in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 		options.args.general.args.color.args.classColors.args[classToken] = Config.classTable
 	end
 
