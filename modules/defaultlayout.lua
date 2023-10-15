@@ -257,6 +257,7 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 			ready = {anchorTo = "$parent", anchorPoint = "LC", size = 24, x = 35, y = 0},
 			role = {anchorTo = "$parent", anchorPoint = "TL", size = 14, x = 30, y = -11},
 			status = {anchorTo = "$parent", anchorPoint = "LB", size = 16, x = 12, y = -2},
+			lfdRole = {enabled = true, anchorPoint = "BR", size = 14, x = 3, y = 14, anchorTo = "$parent"}
 		},
 		highlight = {size = 10},
 		combatText = {anchorTo = "$parent", anchorPoint = "C", x = 0, y = 0},
