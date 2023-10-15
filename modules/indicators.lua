@@ -1,4 +1,4 @@
-local Indicators = {list = {"status", "pvp", "leader", "resurrect", "masterLoot", "raidTarget", "ready", "role", "class", "phase", "happiness" }}
+local Indicators = {list = {"status", "pvp", "leader", "resurrect", "masterLoot", "raidTarget", "ready", "role", "lfdRole", "class", "phase", "happiness" }}
 
 ShadowUF:RegisterModule(Indicators, "indicators", ShadowUF.L["Indicators"])
 
@@ -98,6 +98,7 @@ end
 function Indicators:GroupRosterUpdate(frame)
 	self:UpdateMasterLoot(frame)
 	self:UpdateRole(frame)
+	self:UpdateLFDRole(frame)
 	self:UpdateLeader(frame)
 end
 
@@ -115,6 +116,31 @@ function Indicators:UpdatePVPFlag(frame)
 		frame.indicators.pvp:Show()
 	else
 		frame.indicators.pvp:Hide()
+	end
+end
+
+function Indicators:UpdateLFDRole(frame, event)
+	if( not frame.indicators.lfdRole or not frame.indicators.lfdRole.enabled ) then return end
+
+	local role
+	if( frame.unitType ~= "arena" ) then
+		role = UnitGroupRolesAssigned(frame.unitOwner)
+	else
+		local specID = GetArenaOpponentSpec(frame.unitID)
+		role = specID and select(6, GetSpecializationInfoByID(specID))
+	end
+
+	if( role == "TANK" ) then
+		frame.indicators.lfdRole:SetTexCoord(0, 19/64, 22/64, 41/64)
+		frame.indicators.lfdRole:Show()
+	elseif( role == "HEALER" ) then
+		frame.indicators.lfdRole:SetTexCoord(20/64, 39/64, 1/64, 20/64)
+		frame.indicators.lfdRole:Show()
+	elseif( role == "DAMAGER" ) then
+		frame.indicators.lfdRole:SetTexCoord(20/64, 39/64, 22/64, 41/64)
+		frame.indicators.lfdRole:Show()
+	else
+		frame.indicators.lfdRole:Hide()
 	end
 end
 
@@ -340,6 +366,14 @@ function Indicators:OnEnable(frame)
 		frame.indicators.ready = frame.indicators.ready or frame.indicators:CreateTexture(nil, "OVERLAY")
 	end
 
+	if( config.indicators.lfdRole and config.indicators.lfdRole.enabled ) then
+		frame:RegisterNormalEvent("PLAYER_ROLES_ASSIGNED", self, "UpdateLFDRole")
+		frame:RegisterUpdateFunc(self, "UpdateLFDRole")
+
+		frame.indicators.lfdRole = frame.indicators.lfdRole or frame.indicators:CreateTexture(nil, "OVERLAY")
+		frame.indicators.lfdRole:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
+	end
+
 	if( config.indicators.happiness and config.indicators.happiness.enabled ) then
 		frame:RegisterUnitEvent("UNIT_HAPPINESS", self, "UpdateHappiness")
 		frame:RegisterUpdateFunc(self, "UpdateHappiness")
@@ -349,7 +383,7 @@ function Indicators:OnEnable(frame)
 	end
 
 	-- As they all share the function, register it as long as one is active
-	if( frame.indicators.leader or frame.indicators.masterLoot or frame.indicators.role ) then
+	if( frame.indicators.leader or frame.indicators.masterLoot or frame.indicators.role or ( frame.unit ~= "player" and frame.indicators.lfdRole ) ) then
 		frame:RegisterNormalEvent("GROUP_ROSTER_UPDATE", self, "GroupRosterUpdate")
 	end
 end
