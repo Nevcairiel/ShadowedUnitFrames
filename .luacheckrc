@@ -47,7 +47,6 @@ read_globals = {
 	"CanHearthAndResurrectFromArea",
 	"CastingInfo",
 	"ChannelInfo",
-	"CheckInteractDistance",
 	"CreateFrame",
 	"GetArenaOpponentSpec",
 	"GetBuildInfo",
