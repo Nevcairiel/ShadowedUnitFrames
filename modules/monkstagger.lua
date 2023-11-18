@@ -41,9 +41,9 @@ function Stagger:Update(frame)
 	-- Figure out how screwed they are
 	local percent = stagger / frame.staggerBar.maxHealth
 	local state
-	if( percent < STAGGER_YELLOW_TRANSITION ) then
+	if( percent < STAGGER_STATES.YELLOW.threshold ) then
 		state = "STAGGER_GREEN"
-	elseif( percent < STAGGER_RED_TRANSITION ) then
+	elseif( percent < STAGGER_STATES.RED.threshold ) then
 		state = "STAGGER_YELLOW"
 	else
 		state = "STAGGER_RED"
