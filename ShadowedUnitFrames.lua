@@ -33,7 +33,7 @@ function ShadowUF:OnInitialize()
 			advanced = false,
 			tooltipCombat = false,
 			omnicc = false,
-			blizzardcc = true,
+			blizzardcc = {disabled = true, scale = 0.75},
 			tags = {},
 			units = {},
 			positions = {},
