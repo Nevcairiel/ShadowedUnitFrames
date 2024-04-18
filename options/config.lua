@@ -4745,7 +4745,10 @@ local function loadUnitOptions()
 
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(ShadowUF.db, true)
 	local LibDualSpec = LibStub("LibDualSpec-1.0", true)
-	if LibDualSpec then LibDualSpec:EnhanceOptions(options.args.profile, ShadowUF.db) end
+	if LibDualSpec then
+		LibDualSpec:EnhanceDatabase(ShadowUF.db, "ShadowUF")
+		LibDualSpec:EnhanceOptions(options.args.profile, ShadowUF.db)
+	end
 
 	options.args.enableUnits = {
 		type = "group",
