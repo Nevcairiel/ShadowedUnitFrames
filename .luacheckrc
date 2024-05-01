@@ -59,6 +59,7 @@ read_globals = {
 	"GetPartyAssignment",
 	"GetPetExperience",
 	"GetPetHappiness",
+	"GetPrimaryTalentTree",
 	"GetRaidTargetIndex",
 	"GetReadyCheckStatus",
 	"GetRuneCooldown",
