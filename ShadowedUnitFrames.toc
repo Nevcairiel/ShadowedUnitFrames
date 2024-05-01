@@ -68,6 +68,8 @@ modules\range.lua
 modules\empty.lua
 modules\druid.lua
 modules\runes.lua
+modules\holypower.lua
+modules\soulshards.lua
 #@do-not-package@
 options\config.lua
 #@end-do-not-package@
