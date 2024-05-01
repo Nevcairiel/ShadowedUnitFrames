@@ -792,6 +792,10 @@ Tags.defaultTags = {
 			return ShadowUF.L["Offline"]
 		end
 	end]],
+	["sshards"] = [[function(unit, unitOwner)
+		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.SoulShards)
+		return points and points > 0 and points
+	end]],
 	["hpower"] = [[function(unit, unitOwner)
 		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.HolyPower)
 		return points and points > 0 and points
