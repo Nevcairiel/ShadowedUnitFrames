@@ -1,6 +1,5 @@
-## Interface: 30401
-## Interface-Classic: 11403
-## Interface-BCC: 20504
+## Interface: 40400
+## Interface-Classic: 11502
 ## Title: Shadowed UF (Options)
 ## Notes: Configuration for Shadowed Unit Frames.
 ## Author: Shadowed
