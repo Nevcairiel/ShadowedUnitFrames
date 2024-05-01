@@ -792,6 +792,10 @@ Tags.defaultTags = {
 			return ShadowUF.L["Offline"]
 		end
 	end]],
+	["hpower"] = [[function(unit, unitOwner)
+		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.HolyPower)
+		return points and points > 0 and points
+	end]],
 	["cpoints"] = [[function(unit, unitOwner)
 		return UnitPower("player", Enum.PowerType.ComboPoints)
 	end]],

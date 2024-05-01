@@ -1140,6 +1140,13 @@ local function loadGeneralOptions()
 								name = L["Combo Points"],
 								arg = "powerColors.COMBOPOINTS",
 							},
+							HOLYPOWER = {
+								order = 12,
+								type = "color",
+								name = L["Holy Power"],
+								arg = "powerColors.HOLYPOWER",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "PALADIN" end,
+							},
 						},
 					},
 					cast = {
@@ -2864,6 +2871,84 @@ local function loadUnitOptions()
 								hidden = function(info) return info[2] ~= "party" end,
 								set = function(info, value)
 									if( value ) then
+					holyPower = {
+						order = 4,
+						type = "group",
+						inline = true,
+						name = L["Holy Power"],
+						hidden = function(info) if( info[2] == "global" or getVariable(info[2], "holyPower", nil, "isBar") ) then return true end return hideRestrictedOption(info) end,
+						args = {
+							enabled = {
+								order = 0,
+								type = "toggle",
+								name = string.format(L["Enable %s"], L["Holy Power"]),
+								hidden = false,
+								arg = "holyPower.enabled",
+							},
+							sep1 = {
+								order = 1,
+								type = "description",
+								name = "",
+								width = "full",
+								hidden = hideAdvancedOption,
+							},
+							growth = {
+								order = 2,
+								type = "select",
+								name = L["Growth"],
+								values = {["UP"] = L["Up"], ["LEFT"] = L["Left"], ["RIGHT"] = L["Right"], ["DOWN"] = L["Down"]},
+								hidden = false,
+								arg = "holyPower.growth",
+							},
+							size = {
+								order = 2,
+								type = "range",
+								name = L["Size"],
+								min = 0, max = 50, step = 1, softMin = 0, softMax = 20,
+								hidden = hideAdvancedOption,
+								arg = "holyPower.size",
+							},
+							spacing = {
+								order = 3,
+								type = "range",
+								name = L["Spacing"],
+								min = -30, max = 30, step = 1, softMin = -15, softMax = 15,
+								hidden = hideAdvancedOption,
+								arg = "holyPower.spacing",
+							},
+							sep2 = {
+								order = 4,
+								type = "description",
+								name = "",
+								width = "full",
+								hidden = hideAdvancedOption,
+							},
+							anchorPoint = {
+								order = 5,
+								type = "select",
+								name = L["Anchor point"],
+								values = positionList,
+								hidden = false,
+								arg = "holyPower.anchorPoint",
+							},
+							x = {
+								order = 6,
+								type = "range",
+								name = L["X Offset"],
+								min = -30, max = 30, step = 1,
+								hidden = false,
+								arg = "holyPower.x",
+							},
+							y = {
+								order = 7,
+								type = "range",
+								name = L["Y Offset"],
+								min = -30, max = 30, step = 1,
+								hidden = false,
+								arg = "holyPower.y",
+							},
+						},
+					},
 										setVariable(info[2], nil, nil, "hideSemiRaid", false)
 									end
 
