@@ -366,9 +366,19 @@ function ShadowUF:FormatShortTime(seconds)
 	return string.format("%ds", seconds)
 end
 
+local function utf8len1stchar(str)
+    local byte = str:byte(1)
+    if byte < 128 then return 1 end -- 1-byte character
+    if byte < 224 then return 2 end -- continue of multi-byte character
+    if byte < 240 then return 3 end -- start of 2-byte character
+    if byte < 248 then return 4 end -- start of 3-byte character
+    return 1 -- invalid
+end
+
 -- Name abbreviation
 local function abbreviateName(text)
-	return (string.utf8sub or string.sub)(text, 1, 1) .. "."
+    local lengthOfFirstChar = utf8len1stchar(text)
+    return string.sub(text, 1, lengthOfFirstChar) .. "."
 end
 
 Tags.abbrevCache = setmetatable({}, {
