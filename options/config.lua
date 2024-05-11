@@ -759,7 +759,7 @@ local function loadGeneralOptions()
 								type = "select",
 								name = L["Aura border style"],
 								desc = L["Style of borders to show for all auras."],
-								values = {["dark"] = L["Dark"], ["light"] = L["Light"], ["blizzard"] = L["Blizzard"], [""] = L["None"]},
+								values = {["dark"] = L["Dark"], ["light"] = L["Light"], ["thin"] = L["Thin"], ["blizzard"] = L["Blizzard"], [""] = L["None"]},
 								arg = "auras.borderType",
 							},
 							statusbar = {
