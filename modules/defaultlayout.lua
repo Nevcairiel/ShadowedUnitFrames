@@ -183,6 +183,7 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 		healAbsorb = {r = 0.68, g = 0.47, b = 1},
 		enemyUnattack = {r = 0.60, g = 0.20, b = 0.20},
 		hostile = {r = 0.90, g = 0.0, b = 0.0},
+		aggro = {r = 0.90, g = 0.0, b = 0.0},
 		friendly = {r = 0.20, g = 0.90, b = 0.20},
 		neutral = {r = 0.93, g = 0.93, b = 0.0},
 		offline = {r = 0.50, g = 0.50, b = 0.50}
@@ -340,6 +341,8 @@ function ShadowUF:LoadDefaultLayout(useMerge)
 			totemBar = {enabled = true, background = false, height = 0.40, order = 70},
 			druidBar = {enabled = true, background = true, height = 0.40, order = 70},
 			comboPoints = {enabled = true, anchorTo = "$parent", order = 60, anchorPoint = "BR", x = -3, y = 8, size = 14, spacing = -4, growth = "LEFT", isBar = true, height = 0.40},
+			soulShards = {anchorTo = "$parent", order = 60, height = 0.40, anchorPoint = "BR", x = -8, y = 6, size = 12, spacing = -2, growth = "LEFT", isBar = true, showAlways = true},
+			holyPower = {anchorTo = "$parent", order = 60, height = 0.40, anchorPoint = "BR", x = -3, y = 6, size = 14, spacing = -4, growth = "LEFT", isBar = true, showAlways = true},
 			indicators = {
                 resurrect = {enabled = true, anchorPoint = "LC", size = 28, x = 37, y = -1, anchorTo = "$parent"},
 			},

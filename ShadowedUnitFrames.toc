@@ -1,6 +1,5 @@
-## Interface: 30401
-## Interface-Classic: 11403
-## Interface-BCC: 20504
+## Interface: 40400
+## Interface-Classic: 11502
 ## Title: Shadowed Unit Frames
 ## Notes: Moooooooooooooooooo
 ## Author: Shadowed
@@ -69,6 +68,8 @@ modules\range.lua
 modules\empty.lua
 modules\druid.lua
 modules\runes.lua
+modules\holypower.lua
+modules\soulshards.lua
 #@do-not-package@
 options\config.lua
 #@end-do-not-package@

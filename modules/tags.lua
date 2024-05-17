@@ -808,6 +808,14 @@ Tags.defaultTags = {
 	end]] or [[function(unit, unitOwner)
 		return UnitPower("player", Enum.PowerType.ComboPoints)
 	end]],
+	["sshards"] = [[function(unit, unitOwner)
+		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.SoulShards)
+		return points and points > 0 and points
+	end]],
+	["hpower"] = [[function(unit, unitOwner)
+		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.HolyPower)
+		return points and points > 0 and points
+	end]],
 	["smartlevel"] = [[function(unit, unitOwner)
 		local classif = UnitClassification(unit)
 		if( classif == "worldboss" ) then
