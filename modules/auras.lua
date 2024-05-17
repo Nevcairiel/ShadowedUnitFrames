@@ -1,5 +1,5 @@
 local Auras = {}
-local playerUnits = {player = true, pet = true}
+local playerUnits = {player = true, vehicle = true, pet = true}
 local mainHand, offHand, tempEnchantScan = {time = 0}, {time = 0}
 local canCure = ShadowUF.Units.canCure
 ShadowUF:RegisterModule(Auras, "auras", ShadowUF.L["Auras"])
@@ -236,7 +236,7 @@ local function hideTooltip(self)
 end
 
 local function cancelAura(self, mouse)
-	if( mouse ~= "RightButton" or not UnitIsUnit(self.parent.unit, "player") or InCombatLockdown() or self.filter == "TEMP" ) then
+	if( mouse ~= "RightButton" or ( not UnitIsUnit(self.parent.unit, "player") and not UnitIsUnit(self.parent.unit, "vehicle") ) or InCombatLockdown() or self.filter == "TEMP" ) then
 		return
 	end
 
@@ -465,6 +465,17 @@ end
 
 -- Unfortunately, temporary enchants have basically no support beyond hacks. So we will hack!
 tempEnchantScan = function(self, elapsed)
+	if( self.parent.unit == self.parent.vehicleUnit and self.lastTemporary > 0 ) then
+		mainHand.has = false
+		offHand.has = false
+
+		self.temporaryEnchants = 0
+		self.lastTemporary = 0
+
+		Auras:Update(self.parent)
+		return
+	end
+
 	timeElapsed = timeElapsed + elapsed
 	if( timeElapsed < 0.50 ) then return end
 	timeElapsed = timeElapsed - 0.50

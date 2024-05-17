@@ -11,6 +11,8 @@ local unitFrames, headerFrames, frameList, unitEvents, childUnits, headerUnits, 
 local remappedUnits = Units.remappedUnits
 local _G = getfenv(0)
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF.Units = Units
 ShadowUF:RegisterModule(Units, "units")
 
@@ -37,7 +39,7 @@ local function ReregisterUnitEvents(self)
 
 			if( hasHandler ) then
 				self:UnregisterEvent(event)
-				self:BlizzRegisterUnitEvent(event, self.unitOwner, nil)
+				self:BlizzRegisterUnitEvent(event, self.unitOwner, self.vehicleUnit)
 			end
 		end
 	end
@@ -52,7 +54,7 @@ local function RegisterNormalEvent(self, event, handler, func, unitOverride)
 	end
 
 	if( unitEvents[event] and not ShadowUF.fakeUnits[self.unitRealType] ) then
-		self:BlizzRegisterUnitEvent(event, unitOverride or self.unitOwner, nil)
+		self:BlizzRegisterUnitEvent(event, unitOverride or self.unitOwner, self.vehicleUnit)
 		if unitOverride then
 			self.unitEventOverrides = self.unitEventOverrides or {}
 			self.unitEventOverrides[event] = unitOverride
@@ -285,6 +287,62 @@ local function SetVisibility(self)
 	end
 end
 
+-- Vehicles do not always return their data right away, a pure OnUpdate check seems to be the most accurate unfortunately
+local function checkVehicleData(self, elapsed)
+	self.timeElapsed = self.timeElapsed + elapsed
+	if( self.timeElapsed >= 0.50 ) then
+		self.timeElapsed = 0
+		self.dataAttempts = self.dataAttempts + 1
+
+		-- Took too long to get vehicle data, or they are no longer in a vehicle
+		if( self.dataAttempts >= 6 or not UnitHasVehicleUI(self.unitOwner) or not UnitHasVehiclePlayerFrameUI(self.unitOwner) ) then
+			self.timeElapsed = nil
+			self.dataAttempts = nil
+			self:SetScript("OnUpdate", nil)
+
+			self.inVehicle = false
+			self.unit = self.unitOwner
+			self:FullUpdate()
+
+		-- Got data, stop checking and do a full frame update
+		elseif( UnitIsConnected(self.unit) or UnitHealthMax(self.unit) > 0 ) then
+			self.timeElapsed = nil
+			self.dataAttempts = nil
+			self:SetScript("OnUpdate", nil)
+
+			self.unitGUID = UnitGUID(self.unit)
+			self:FullUpdate()
+		end
+	end
+end
+
+-- Check if a unit entered a vehicle
+function Units:CheckVehicleStatus(frame, event, unit)
+	if( event and frame.unitOwner ~= unit ) then return end
+
+	-- Not in a vehicle yet, and they entered one that has a UI or they were in a vehicle but the GUID changed (vehicle -> vehicle)
+	if( ( not frame.inVehicle or frame.unitGUID ~= UnitGUID(frame.vehicleUnit) ) and UnitHasVehicleUI(frame.unitOwner) and UnitHasVehiclePlayerFrameUI(frame.unitOwner) and not ShadowUF.db.profile.units[frame.unitType].disableVehicle ) then
+		frame.inVehicle = true
+		frame.unit = frame.vehicleUnit
+
+		if( not UnitIsConnected(frame.unit) or UnitHealthMax(frame.unit) == 0 ) then
+			frame.timeElapsed = 0
+			frame.dataAttempts = 0
+			frame:SetScript("OnUpdate", checkVehicleData)
+		else
+			frame.unitGUID = UnitGUID(frame.unit)
+			frame:FullUpdate()
+		end
+
+	-- Was in a vehicle, no longer has a UI
+	elseif( frame.inVehicle and ( not UnitHasVehicleUI(frame.unitOwner) or not UnitHasVehiclePlayerFrameUI(frame.unitOwner) or ShadowUF.db.profile.units[frame.unitType].disableVehicle ) ) then
+		frame.inVehicle = false
+		frame.unit = frame.unitOwner
+		frame.unitGUID = UnitGUID(frame.unit)
+		frame:FullUpdate()
+	end
+end
+
 -- Handles checking for GUID changes for doing a full update, this fixes frames sometimes showing the wrong unit when they change
 function Units:CheckUnitStatus(frame)
 	local guid = frame.unit and UnitGUID(frame.unit)
@@ -310,8 +368,15 @@ end
 -- OnAttributeChanged won't do anything because the frame is already setup, however, the active unit is non-existant
 -- while the primary unit is. So if we see they're in a vehicle with this case, we force the full update to get the vehicle change
 function Units:CheckGroupedUnitStatus(frame)
-	frame.unitGUID = UnitGUID(frame.unit)
-	frame:FullUpdate()
+	if( frame.inVehicle and not UnitExists(frame.unit) and UnitExists(frame.unitOwner) ) then
+		frame.inVehicle = false
+		frame.unit = frame.unitOwner
+		frame.unitGUID = UnitGUID(frame.unit)
+		frame:FullUpdate()
+	else
+		frame.unitGUID = UnitGUID(frame.unit)
+		frame:FullUpdate()
+	end
 end
 
 -- More fun with sorting, due to sorting magic we have to check if we want to create stuff when the frame changes of partys too
@@ -349,6 +414,7 @@ end
 -- unitType = Unitid minus numbers in it, used for configuration
 -- unitRealType = The actual unit type, if party is shown in raid this will be "party" while unitType is still "raid"
 -- unitOwner = Always the units owner even when unit changes due to vehicles
+-- vehicleUnit = Unit to use when the unitOwner is in a vehicle
 OnAttributeChanged = function(self, name, unit)
 	if( name ~= "unit" or not unit or unit == self.unitOwner ) then return end
 
@@ -362,6 +428,8 @@ OnAttributeChanged = function(self, name, unit)
 	self.unitRealType = string.gsub(unit, "([0-9]+)", "")
 	self.unitType = self.unitUnmapped and string.gsub(self.unitUnmapped, "([0-9]+)", "") or self.unitType or self.unitRealType
 	self.unitOwner = unit
+	self.vehicleUnit = self.unitOwner == "player" and "vehicle" or self.unitRealType == "party" and "partypet" .. self.unitID or self.unitRealType == "raid" and "raidpet" .. self.unitID or nil
+	self.inVehicle = nil
 
 	-- Split everything into two maps, this is the simple parentUnit -> frame map
 	-- This is for things like finding a party parent for party target/pet, the main map for doing full updates is
@@ -396,6 +464,13 @@ OnAttributeChanged = function(self, name, unit)
 		ClickCastFrames[self] = true
 	end
 
+	-- Handles switching the internal unit variable to that of their vehicle
+	if( WoWWrath and ( self.unit == "player" or self.unitRealType == "party" or self.unitRealType == "raid" ) ) then
+		self:RegisterNormalEvent("UNIT_ENTERED_VEHICLE", Units, "CheckVehicleStatus")
+		self:RegisterNormalEvent("UNIT_EXITED_VEHICLE", Units, "CheckVehicleStatus")
+		self:RegisterUpdateFunc(Units, "CheckVehicleStatus")
+	end
+
 	-- Phase change, do a full update on it
 	self:RegisterUnitEvent("UNIT_PHASE", self, "FullUpdate")
 
@@ -404,6 +479,35 @@ OnAttributeChanged = function(self, name, unit)
 		self.unitRealOwner = self.unit == "pet" and "player" or ShadowUF.partyUnits[self.unitID]
 		self:SetAttribute("unitRealOwner", self.unitRealOwner)
 		self:RegisterNormalEvent("UNIT_PET", Units, "CheckPetUnitUpdated")
+
+		if WoWWrath then
+			if( self.unit == "pet" ) then
+				self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.player.disableVehicle)
+			else
+				self:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units.party.disableVehicle)
+			end
+
+			-- Logged out in a vehicle
+			if( UnitHasVehicleUI(self.unitRealOwner) and UnitHasVehiclePlayerFrameUI(self.unitRealOwner) ) then
+				self:SetAttribute("unitIsVehicle", true)
+			end
+
+			-- Hide any pet that became a vehicle, we detect this by the owner being untargetable but they have a pet out
+			stateMonitor:WrapScript(self, "OnAttributeChanged", [[
+				if( name == "state-vehicleupdated" ) then
+					self:SetAttribute("unitIsVehicle", UnitHasVehicleUI(self:GetAttribute("unitRealOwner")) and value == "vehicle" and true or false)
+				elseif( name == "disablevehicleswap" or name == "state-unitexists" or name == "unitisvehicle" ) then
+					-- Unit does not exist, OR unit is a vehicle and vehicle swap is not disabled, hide frame
+					if( not self:GetAttribute("state-unitexists") or ( self:GetAttribute("unitIsVehicle") and not self:GetAttribute("disableVehicleSwap") ) ) then
+						self:Hide()
+						-- Unit exists, show it
+					else
+						self:Show()
+					end
+				end
+			]])
+			RegisterStateDriver(self, "vehicleupdated", string.format("[target=%s, nohelp, noharm] vehicle; pet", self.unitRealOwner, self.unit))
+		end
 
 	-- Automatically do a full update on target change
 	elseif( self.unit == "target" ) then
@@ -418,6 +522,11 @@ OnAttributeChanged = function(self, name, unit)
 		self:RegisterUnitEvent("UNIT_TARGETABLE_CHANGED", self, "FullUpdate")
 
 	elseif( self.unit == "player" ) then
+		-- this should not get called in combat, but just in case make sure we are not actually in combat
+		if not InCombatLockdown() then
+			self:SetAttribute("toggleForVehicle", true)
+		end
+
 		-- Force a full update when the player is alive to prevent freezes when releasing in a zone that forces a ressurect (naxx/tk/etc)
 		self:RegisterNormalEvent("PLAYER_ALIVE", self, "FullUpdate")
 
@@ -490,6 +599,8 @@ local secureInitializeUnit = [[
 	self:SetHeight(header:GetAttribute("style-height"))
 	self:SetWidth(header:GetAttribute("style-width"))
 	self:SetScale(header:GetAttribute("style-scale"))
+
+	self:SetAttribute("toggleForVehicle", true)
 
 	self:SetAttribute("*type1", "target")
 	self:SetAttribute("*type2", "togglemenu")

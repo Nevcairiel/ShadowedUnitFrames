@@ -22,7 +22,7 @@ function Druid:OnLayoutApplied(frame)
 end
 
 function Druid:PowerChanged(frame)
-	local visible = UnitPowerType(frame.unit) ~= Enum.PowerType.Mana
+	local visible = UnitPowerType(frame.unit) ~= Enum.PowerType.Mana and not frame.inVehicle
 	local type = visible and "RegisterUnitEvent" or "UnregisterSingleEvent"
 
 	frame[type](frame, "UNIT_POWER_FREQUENT", self, "Update")

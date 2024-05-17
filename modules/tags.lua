@@ -4,6 +4,8 @@ local L = ShadowUF.L
 
 ShadowUF.Tags = Tags
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 -- Map the numeric index to the string
 local numerics = {}
 for id, color in pairs(PowerBarColor) do
@@ -792,7 +794,18 @@ Tags.defaultTags = {
 			return ShadowUF.L["Offline"]
 		end
 	end]],
-	["cpoints"] = [[function(unit, unitOwner)
+	["cpoints"] = WoWWrath and [[function(unit, unitOwner)
+		if( UnitHasVehicleUI("player") and UnitHasVehiclePlayerFrameUI("player") ) then
+			local points = GetComboPoints("vehicle")
+			if( points == 0 ) then
+				points = GetComboPoints("vehicle", "vehicle")
+			end
+
+			return points
+		else
+			return UnitPower("player", Enum.PowerType.ComboPoints)
+		end
+	end]] or [[function(unit, unitOwner)
 		return UnitPower("player", Enum.PowerType.ComboPoints)
 	end]],
 	["sshards"] = [[function(unit, unitOwner)
