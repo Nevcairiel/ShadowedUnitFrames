@@ -380,14 +380,14 @@ end})
 
 -- Going to have to start using an env wrapper for tags I think
 local Druid = {}
-Druid.CatForm = GetSpellInfo(768)
-Druid.MoonkinForm = GetSpellInfo(24858)
-Druid.TravelForm = GetSpellInfo(783)
-Druid.BearForm = GetSpellInfo(5487)
-Druid.TreeForm = GetSpellInfo(33891)
-Druid.AquaticForm = GetSpellInfo(1066)
-Druid.SwiftFlightForm = GetSpellInfo(40120)
-Druid.FlightForm = GetSpellInfo(33943)
+Druid.CatForm = C_Spell.GetSpellInfo(768)
+Druid.MoonkinForm = C_Spell.GetSpellInfo(24858)
+Druid.TravelForm = C_Spell.GetSpellInfo(783)
+Druid.BearForm = C_Spell.GetSpellInfo(5487)
+Druid.TreeForm = C_Spell.GetSpellInfo(33891)
+Druid.AquaticForm = C_Spell.GetSpellInfo(1066)
+Druid.SwiftFlightForm = C_Spell.GetSpellInfo(40120)
+Druid.FlightForm = C_Spell.GetSpellInfo(33943)
 ShadowUF.Druid = Druid
 
 Tags.defaultTags = {
@@ -719,8 +719,7 @@ Tags.defaultTags = {
 		if( UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit) ) then
 			return UnitBattlePetLevel(unit)
 		end
-
-		local level = UnitLevel(unit)
+		local level = UnitLevel(unit) or 0
 		return level > 0 and level or UnitClassification(unit) ~= "worldboss" and "??" or nil
 	end]],
 	["maxhp"] = [[function(unit, unitOwner) return ShadowUF:FormatLargeNumber(UnitHealthMax(unit)) end]],

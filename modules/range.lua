@@ -1,43 +1,43 @@
 local Range = {
 	friendly = {
 		["PRIEST"] = {
-			(GetSpellInfo(17)), -- Power Word: Shield
-			(GetSpellInfo(527)), -- Purify
+			(C_Spell.GetSpellInfo(17)), -- Power Word: Shield
+			(C_Spell.GetSpellInfo(527)), -- Purify
 		},
 		["DRUID"] = {
-			(GetSpellInfo(774)), -- Rejuvenation
-			(GetSpellInfo(2782)), -- Remove Corruption
+			(C_Spell.GetSpellInfo(774)), -- Rejuvenation
+			(C_Spell.GetSpellInfo(2782)), -- Remove Corruption
 		},
-		["PALADIN"] = GetSpellInfo(19750), -- Flash of Light
-		["SHAMAN"] = GetSpellInfo(8004), -- Healing Surge
-		["WARLOCK"] = GetSpellInfo(5697), -- Unending Breath
-		--["DEATHKNIGHT"] = GetSpellInfo(47541), -- Death Coil
-		["MONK"] = GetSpellInfo(115450), -- Detox
+		["PALADIN"] = C_Spell.GetSpellInfo(19750), -- Flash of Light
+		["SHAMAN"] = C_Spell.GetSpellInfo(8004), -- Healing Surge
+		["WARLOCK"] = C_Spell.GetSpellInfo(5697), -- Unending Breath
+		--["DEATHKNIGHT"] = C_Spell.GetSpellInfo(47541), -- Death Coil
+		["MONK"] = C_Spell.GetSpellInfo(115450), -- Detox
 	},
 	hostile = {
 		["DEATHKNIGHT"] = {
-			(GetSpellInfo(47541)), -- Death Coil
-			(GetSpellInfo(49576)), -- Death Grip
+			(C_Spell.GetSpellInfo(47541)), -- Death Coil
+			(C_Spell.GetSpellInfo(49576)), -- Death Grip
 		},
-		["DEMONHUNTER"] = GetSpellInfo(185123), -- Throw Glaive
-		["DRUID"] = GetSpellInfo(8921),  -- Moonfire
+		["DEMONHUNTER"] = C_Spell.GetSpellInfo(185123), -- Throw Glaive
+		["DRUID"] = C_Spell.GetSpellInfo(8921),  -- Moonfire
 		["HUNTER"] = {
-			(GetSpellInfo(193455)), -- Cobra Shot
-			(GetSpellInfo(19434)), -- Aimed Short
-			(GetSpellInfo(193265)), -- Hatchet Toss
+			(C_Spell.GetSpellInfo(193455)), -- Cobra Shot
+			(C_Spell.GetSpellInfo(19434)), -- Aimed Short
+			(C_Spell.GetSpellInfo(193265)), -- Hatchet Toss
 		},
 		["MAGE"] = {
-			(GetSpellInfo(116)), -- Frostbolt
-			(GetSpellInfo(30451)), -- Arcane Blast
-			(GetSpellInfo(133)), -- Fireball
+			(C_Spell.GetSpellInfo(116)), -- Frostbolt
+			(C_Spell.GetSpellInfo(30451)), -- Arcane Blast
+			(C_Spell.GetSpellInfo(133)), -- Fireball
 		},
-		["MONK"] = GetSpellInfo(115546), -- Provoke
-		["PALADIN"] = GetSpellInfo(62124), -- Hand of Reckoning
-		["PRIEST"] = GetSpellInfo(585), -- Smite
-		--["ROGUE"] = GetSpellInfo(1725), -- Distract
-		["SHAMAN"] = GetSpellInfo(403), -- Lightning Bolt
-		["WARLOCK"] = GetSpellInfo(686), -- Shadow Bolt
-		["WARRIOR"] = GetSpellInfo(355), -- Taunt
+		["MONK"] = C_Spell.GetSpellInfo(115546), -- Provoke
+		["PALADIN"] = C_Spell.GetSpellInfo(62124), -- Hand of Reckoning
+		["PRIEST"] = C_Spell.GetSpellInfo(585), -- Smite
+		--["ROGUE"] = C_Spell.GetSpellInfo(1725), -- Distract
+		["SHAMAN"] = C_Spell.GetSpellInfo(403), -- Lightning Bolt
+		["WARLOCK"] = C_Spell.GetSpellInfo(686), -- Shadow Bolt
+		["WARRIOR"] = C_Spell.GetSpellInfo(355), -- Taunt
 	},
 }
 
@@ -81,24 +81,38 @@ local function checkRange(self)
 	end
 end
 
+local function isUsable(key)
+	if key and not type(key) == "table" then
+		local isUsable, _ = C_Spell.IsSpellUsable(key)
+		return isUsable
+	end
+end
+
 local function updateSpellCache(category)
 	rangeSpells[category] = nil
-	if( IsUsableSpell(ShadowUF.db.profile.range[category .. playerClass]) ) then
+	if( isUsable(ShadowUF.db.profile.range[category .. playerClass]) ) then
 		rangeSpells[category] = ShadowUF.db.profile.range[category .. playerClass]
 
-	elseif( IsUsableSpell(ShadowUF.db.profile.range[category .. "Alt" .. playerClass]) ) then
+	elseif( isUsable(ShadowUF.db.profile.range[category .. "Alt" .. playerClass]) ) then
 		rangeSpells[category] = ShadowUF.db.profile.range[category .. "Alt" .. playerClass]
 
 	elseif( Range[category][playerClass] ) then
 		if( type(Range[category][playerClass]) == "table" ) then
 			for i = 1, #Range[category][playerClass] do
 				local spell = Range[category][playerClass][i]
-				if( IsUsableSpell(spell) ) then
-					rangeSpells[category] = spell
-					break
+				if( type(spell) == "table") then
+					if( isUsable(spell.spellID) ) then
+						rangeSpells[category] = spell
+						break
+					end
+				else
+					if( isUsable(spell) ) then
+						rangeSpells[category] = spell
+						break
+					end
 				end
 			end
-		elseif( IsUsableSpell(Range[category][playerClass]) ) then
+		elseif( isUsable(Range[category][playerClass]) ) then
 			rangeSpells[category] = Range[category][playerClass]
 		end
 	end

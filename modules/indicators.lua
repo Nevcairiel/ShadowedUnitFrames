@@ -279,7 +279,7 @@ function Indicators:UpdateReadyCheck(frame, event)
 
 		-- Player never responded so they are AFK
 		if( frame.indicators.ready.status == "waiting" ) then
-			frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady")
 		end
 		return
 	end
@@ -293,11 +293,11 @@ function Indicators:UpdateReadyCheck(frame, event)
 	end
 
 	if( status == "ready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
 	elseif( status == "notready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady")
 	elseif( status == "waiting" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_WAITING_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture("Interface\\RaidFrame\\ReadyCheck-Waiting")
 	end
 
 	frame.indicators:SetScript("OnUpdate", nil)

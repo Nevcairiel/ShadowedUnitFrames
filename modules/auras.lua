@@ -2,6 +2,18 @@ local Auras = {}
 local playerUnits = {player = true, vehicle = true, pet = true}
 local mainHand, offHand, tempEnchantScan = {time = 0}, {time = 0}
 local canCure = ShadowUF.Units.canCure
+
+local C_UnitAuras = C_UnitAuras
+local CreateFrame = CreateFrame
+local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local GetTime = GetTime
+local InCombatLockdown = InCombatLockdown
+local IsInInstance = IsInInstance
+local UnitIsUnit = UnitIsUnit
+local pairs = pairs
+local setmetatable = setmetatable
+local tostring = tostring
+
 ShadowUF:RegisterModule(Auras, "auras", ShadowUF.L["Auras"])
 
 function Auras:OnEnable(frame)
@@ -520,12 +532,19 @@ local function categorizeAura(type, curable, auraType, caster, isRemovable, canA
 	end
 end
 
-local function renderAura(parent, frame, type, config, displayConfig, index, filter, isFriendly, curable, name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff)
+local function renderAura(parent, frame, type, config, displayConfig, index, filter, isFriendly, curable, auraData)
+	local name = auraData.name
 	-- aura filters are all saved as strings, so need to override here
-	spellID = tostring(spellID)
+	local spellID = tostring(auraData.spellId)
 	-- Do our initial list check to see if we can quick filter it out
 	if( parent.whitelist[type] and not parent.whitelist[name] and not parent.whitelist[spellID] ) then return end
 	if( parent.blacklist[type] and ( parent.blacklist[name] or parent.blacklist[spellID] ) ) then return end
+
+	local auraType = auraData.dispelName
+	local caster = auraData.sourceUnit
+	local isRemovable = auraData.isStealable
+	local canApplyAura = auraData.canApplyAura
+	local isBossDebuff = auraData.isBossAura
 
 	-- Now do our type filter
 	local category = categorizeAura(type, curable, auraType, caster, isRemovable, canApplyAura, isBossDebuff)
@@ -548,6 +567,9 @@ local function renderAura(parent, frame, type, config, displayConfig, index, fil
 	else
 		button.border:SetVertexColor(0.60, 0.60, 0.60)
 	end
+
+	local duration = auraData.duration
+	local endTime = auraData.expirationTime
 
 	-- Show the cooldown ring
 	if( not ShadowUF.db.profile.auras.disableCooldown and duration > 0 and endTime > 0 and ( config.timers.ALL or ( category == "player" and config.timers.SELF ) or ( category == "boss" and config.timers.BOSS ) ) ) then
@@ -578,7 +600,8 @@ local function renderAura(parent, frame, type, config, displayConfig, index, fil
 	button.unit = frame.parent.unit
 	button.columnHasScaled = nil
 	button.previousHasScale = nil
-	button.icon:SetTexture(texture)
+	button.icon:SetTexture(auraData.icon)
+	local count = auraData.applications
 	button.stack:SetText(count > 1 and count or "")
 	button:Show()
 end
@@ -594,10 +617,10 @@ local function scan(parent, frame, type, config, displayConfig, filter)
 	local index = 0
 	while( true ) do
 		index = index + 1
-		local name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff = UnitAura(frame.parent.unit, index, filter)
-		if( not name ) then break end
+		local auraData = GetAuraDataByIndex(frame.parent.unit, index, filter)
+		if( not auraData ) then break end
 
-		renderAura(parent, frame, type, config, displayConfig, index, filter, isFriendly, curable, name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff)
+		renderAura(parent, frame, type, config, displayConfig, index, filter, isFriendly, curable, auraData)
 
 		-- Too many auras shown, break out
 		-- Get down
