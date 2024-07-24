@@ -232,6 +232,8 @@ local function updateButton(id, group, config)
 		button.cooldown:SetDrawEdge(false)
 		button.cooldown:SetDrawSwipe(true)
 		button.cooldown:SetSwipeColor(0, 0, 0, 0.8)
+		-- Scaling compared to aura frame
+		button.cooldown:SetScale(ShadowUF.db.profile.blizzardcc.scale)
 		button.cooldown:Hide()
 
 		button.stack = button:CreateFontString(nil, "OVERLAY")
