@@ -86,7 +86,7 @@ end
 
 function XP:UpdateRep(frame)
 	if( not frame.xpBar.rep ) then return end
-	local factionData = 	C_Reputation.GetWatchedFactionData()
+	local factionData = C_Reputation.GetWatchedFactionData()
 	if( not factionData ) then
 		frame.xpBar.rep:Hide()
 		return
