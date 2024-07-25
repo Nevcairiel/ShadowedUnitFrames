@@ -86,11 +86,13 @@ end
 
 function XP:UpdateRep(frame)
 	if( not frame.xpBar.rep ) then return end
-	local name, reaction, min, max, current = GetWatchedFactionInfo()
-	if( not name ) then
+	local factionData = 	C_Reputation.GetWatchedFactionData()
+	if( not factionData ) then
 		frame.xpBar.rep:Hide()
 		return
 	end
+	local name, reaction, min, max, current = factionData.name, factionData.reaction, factionData.currentReactionThreshold, factionData.nextReactionThreshold, factionData.currentStanding
+
 
 	-- Blizzard stores faction info related to Exalted, not your current level, so get more mathier to find the current reputation using the current standing tier
 	current = math.abs(min - current)
