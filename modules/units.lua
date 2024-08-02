@@ -713,6 +713,8 @@ function Units:CreateUnit(...)
 	frame.UnitClassToken = ClassToken
 	frame.topFrameLevel = 5
 
+	frame:SetFrameStrata(ShadowUF.db.profile.unitStrata)
+
 	-- Ensures that text is the absolute highest thing there is
 	frame.highFrame = CreateFrame("Frame", nil, frame)
 	frame.highFrame:SetFrameLevel(frame.topFrameLevel + 2)
