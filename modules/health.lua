@@ -62,8 +62,10 @@ function Health:UpdateAura(frame)
 		local id = 0
 		while( true ) do
 			id = id + 1
-			local name, _, _, auraType = UnitDebuff(frame.unit, id)
-			if( not name ) then break end
+			local auraData = C_UnitAuras.GetAuraDataByIndex(frame.unit, id, "HARMFUL")
+			if not auraData then break end
+			local name = auraData.name
+			local auraType = auraData.dispelName
 
 			if( canCure[auraType] ) then
 				frame.healthBar.hasDebuff = auraType
