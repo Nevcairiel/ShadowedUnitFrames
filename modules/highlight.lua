@@ -179,7 +179,10 @@ function Highlight:UpdateAura(frame)
 		local id = 0
 		while( true ) do
 			id = id + 1
-			local name, _, _, auraType = C_UnitAuras.GetDebuffDataByIndex(frame.unit, id)
+			local auraData = C_UnitAuras.GetAuraDataByIndex(frame.unit, id, "HARMFUL")
+			if not auraData then break end
+			local name = auraData.name
+			local auraType = auraData.dispelName
 			if( not name ) then break end
 			if( auraType == "" ) then auraType = "Enrage" end
 
