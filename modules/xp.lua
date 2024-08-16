@@ -86,7 +86,15 @@ end
 
 function XP:UpdateRep(frame)
 	if( not frame.xpBar.rep ) then return end
-	local name, reaction, min, max, current = GetWatchedFactionInfo()
+	
+	local watchedFactionData = C_Reputation.GetWatchedFactionData()
+	if (watchedFactionData == nil) then return end
+	local name = watchedFactionData.name
+	local reaction = watchedFactionData.reaction
+	local min = watchedFactionData.currentReactionThreshold
+	local max = watchedFactionData.nextReactionThreshold
+	local current = watchedFactionData.currentStanding
+	
 	if( not name ) then
 		frame.xpBar.rep:Hide()
 		return
