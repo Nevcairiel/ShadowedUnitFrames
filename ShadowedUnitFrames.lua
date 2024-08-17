@@ -702,6 +702,7 @@ local function hideBlizzardFrames(taint, ...)
 			frame:SetParent(ShadowUF.hiddenFrame)
 			frame:HookScript("OnShow", rehideFrame)
 		else
+			local old_parent = frame:GetParent()
 			EditModeManagerFrame:HookScript("OnShow", function(self)
 				frame:SetParent(old_parent)
 				end
