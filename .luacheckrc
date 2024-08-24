@@ -143,6 +143,7 @@ read_globals = {
 	"ArenaEnemyFramesContainer",
 	"ArenaEnemyPrepFramesContainer",
 	"ArenaEnemyMatchFramesContainer",
+	"BossTargetFrameContainer",
 	"BuffFrame",
 	"ComboFrame",
 	"CompactPartyFrame",
