@@ -32,6 +32,7 @@ function ShadowUF:OnInitialize()
 			locked = false,
 			advanced = false,
 			tooltipCombat = false,
+			bossmodSpellRename = true,
 			omnicc = false,
 			blizzardcc = true,
 			tags = {},

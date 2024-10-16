@@ -751,6 +751,14 @@ local function loadGeneralOptions()
 								arg = "tooltipCombat",
 								width = "double",
 							},
+							bossmodCastNames = {
+								order = 3.1,
+								type = "toggle",
+								name = L["Use Boss Mod Cast Name overrides"],
+								desc = L["Use spell name overrides provided by boss mods (BigWigs) on the cast bars."],
+								arg = "bossmodSpellRename",
+								width = "double",
+							},
 							sep2 = {
 								order = 3.5,
 								type = "description",

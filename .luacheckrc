@@ -39,6 +39,7 @@ read_globals = {
 	-- misc custom, third party libraries
 	"ClickCastHeader",
 	"LibStub",
+	"BigWigsAPI",
 
 	-- API functions
 	"C_AddOns",
