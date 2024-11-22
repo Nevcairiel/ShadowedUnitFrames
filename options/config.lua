@@ -2706,6 +2706,34 @@ local function loadUnitOptions()
 								hidden = false,
 								isPercent = true,
 							},
+							ignoreCasting = {
+								order = 3,
+								type = "toggle",
+								name = L["Ignore casting"],
+								hidden = false,
+								arg = "fader.ignoreCasting"
+							},
+							ignoreHealthRegen = {
+								order = 4,
+								type = "toggle",
+								name = L["Ignore health regen"],
+								hidden = false,
+								arg = "fader.ignoreHealthRegen"
+							},
+							ignorePowerRegen = {
+								order = 5,
+								type = "toggle",
+								name = L["Ignore power regen"],
+								hidden = false,
+								arg = "fader.ignorePowerRegen"
+							},
+							ignoreTargetting = {
+								order = 6,
+								type = "toggle",
+								name = L["Ignore targetting"],
+								hidden = false,
+								arg = "fader.ignoreTargetting"
+							},
 						}
 					},
 					range = {
