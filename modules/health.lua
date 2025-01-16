@@ -115,7 +115,7 @@ function Health:UpdateColor(frame)
 				color = ShadowUF.db.profile.healthColors.hostile
 			end
 		end
-	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorType == "class" and (UnitIsPlayer(unit) or unit == "pet") ) then
+	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorType == "class" and (UnitIsPlayer(unit) or UnitInPartyIsAI(unit) or unit == "pet") ) then
 		local class = (unit == "pet") and "PET" or frame:UnitClassToken()
 		color = class and ShadowUF.db.profile.classColors[class]
 	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorType == "playerclass" and unit == "pet") then

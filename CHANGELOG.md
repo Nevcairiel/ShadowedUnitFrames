@@ -1,7 +1,7 @@
 # Shadowed Unit Frames
 
-## [v4.4.8-9-g4c0ed7e](https://github.com/Nevcairiel/ShadowedUnitFrames/tree/4c0ed7e0713aa4242ce9daa281764b0fc9db3916) (2024-07-20)
-[Full Changelog](https://github.com/Nevcairiel/ShadowedUnitFrames/compare/v4.4.8...4c0ed7e0713aa4242ce9daa281764b0fc9db3916) [Previous Releases](https://github.com/Nevcairiel/ShadowedUnitFrames/releases)
+## [v4.4.9](https://github.com/Nevcairiel/ShadowedUnitFrames/tree/v4.4.9) (2024-07-20)
+[Full Changelog](https://github.com/Nevcairiel/ShadowedUnitFrames/compare/v4.4.8...v4.4.9) [Previous Releases](https://github.com/Nevcairiel/ShadowedUnitFrames/releases)
 
 - Safety check for valid spell being set  
 - Update Aura API changes  
