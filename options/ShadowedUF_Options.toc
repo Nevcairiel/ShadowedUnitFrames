@@ -4,6 +4,7 @@
 ## Author: Shadowed
 ## LoadOnDemand: true
 ## Dependencies: ShadowedUnitFrames
+## Category: ShadowedUnitFrames
 
 #@no-lib-strip@
 libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
