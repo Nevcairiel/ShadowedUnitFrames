@@ -1,14 +1,8 @@
 # Shadowed Unit Frames
 
-## [v4.4.9](https://github.com/Nevcairiel/ShadowedUnitFrames/tree/v4.4.9) (2024-07-20)
-[Full Changelog](https://github.com/Nevcairiel/ShadowedUnitFrames/compare/v4.4.8...v4.4.9) [Previous Releases](https://github.com/Nevcairiel/ShadowedUnitFrames/releases)
+## [v4.4.11-3-g77bd580](https://github.com/Nevcairiel/ShadowedUnitFrames/tree/77bd580c9a58ab07f38eab6bc0368f2c0d8e92c6) (2024-10-16)
+[Full Changelog](https://github.com/Nevcairiel/ShadowedUnitFrames/compare/v4.4.11...77bd580c9a58ab07f38eab6bc0368f2c0d8e92c6) [Previous Releases](https://github.com/Nevcairiel/ShadowedUnitFrames/releases)
 
-- Safety check for valid spell being set  
-- Update Aura API changes  
-- Update HideBlizzard for health bar changes  
-- Safety for UnitLevel  
-- Spell API updates for Range module  
-- Update TOC  
-- Update C\_AddOns APIs  
-- GetSpellInfo API replacements  
-- Remove defunct battleground zone filter  
+- Update TOC for future releases  
+- Specify ubuntu-22.04 as the running image, as latest lacks subversion  
+- Add support for BigWigs Spell Renames  

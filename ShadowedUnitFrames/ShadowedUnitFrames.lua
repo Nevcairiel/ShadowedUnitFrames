@@ -32,6 +32,7 @@ function ShadowUF:OnInitialize()
 			locked = false,
 			advanced = false,
 			tooltipCombat = false,
+			bossmodSpellRename = true,
 			omnicc = false,
 			blizzardcc = true,
 			tags = {},
@@ -708,7 +709,7 @@ end
 local active_hiddens = {}
 function ShadowUF:HideBlizzardFrames()
 	if( self.db.profile.hidden.cast and not active_hiddens.cast ) then
-		hideBlizzardFrames(true, PlayerCastingBarFrame or CastingBarFrame, PetCastingBarFrame)
+		hideBlizzardFrames(true, PlayerCastingBarFrame, PetCastingBarFrame)
 	end
 
 	if( self.db.profile.hidden.party and not active_hiddens.party ) then
@@ -767,12 +768,11 @@ function ShadowUF:HideBlizzardFrames()
 	end
 
 	if( self.db.profile.hidden.buffs and not active_hiddens.buffs ) then
-		hideBlizzardFrames(false, BuffFrame, TemporaryEnchantFrame or DebuffFrame)
+		hideBlizzardFrames(false, BuffFrame, DebuffFrame)
 	end
 
 	if( self.db.profile.hidden.player and not active_hiddens.player ) then
-		-- alternate bar renamed in 10.1.5
-		hideBlizzardFrames(false, PlayerFrame, PlayerFrameAlternateManaBar or AlternatePowerBar)
+		hideBlizzardFrames(false, PlayerFrame, AlternatePowerBar)
 
 		-- We keep these in case someone is still using the default auras, otherwise it messes up vehicle stuff
 		PlayerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")

@@ -1,5 +1,5 @@
-local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
-local IsSpellUsable = C_Spell and C_Spell.IsSpellUsable or IsUsableSpell
+local GetSpellName = C_Spell.GetSpellName
+local IsSpellUsable = C_Spell.IsSpellUsable
 local Range = {
 	friendly = {
 		["PRIEST"] = {

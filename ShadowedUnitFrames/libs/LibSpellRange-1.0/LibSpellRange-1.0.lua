@@ -10,7 +10,7 @@
 -- @name LibSpellRange-1.0.lua
 
 local major = "SpellRange-1.0"
-local minor = 21
+local minor = 24
 
 assert(LibStub, format("%s requires LibStub.", major))
 
@@ -23,21 +23,49 @@ local wipe = _G.wipe
 local type = _G.type
 local select = _G.select
 
+-- Handles updating spellsByName and spellsByID
+if not Lib.updaterFrame then
+	Lib.updaterFrame = CreateFrame("Frame")
+end
+Lib.updaterFrame:UnregisterAllEvents()
+
+if C_Spell.IsSpellInRange then
+	-- In TWW, IsSpellInRange supports both spell names and IDs
+	-- and also automatically handles override spells (i.e. when given a base spell
+	-- that has an active override, the range of the override is what's checked - 
+	-- no need to pass the input through C_Spell.GetOverrideSpell).
+	-- And it once again works with pet spells too!
+
+	-- It remains to be seen if C_Spell.IsSpellInRange will continue to be so well behaved
+	-- if/when it is brought to classic and era. May need to change the feature detection used.
+
+	-- Some good spells to test with:
+	-- 	Templar's Verdict (base) & Final Verdict (ret pally talent), talent has longer range than base
+	--	Growl (hunter pet) - pet spell with range.
+
+	local IsSpellInRange = C_Spell.IsSpellInRange
+	local SpellHasRange = C_Spell.SpellHasRange
+
+	function Lib.IsSpellInRange(spellInput, unit)
+		local result = IsSpellInRange(spellInput, unit)
+		return result and 1 or result == false and 0 or result
+	end
+
+	function Lib.SpellHasRange(spellInput)
+		local result = SpellHasRange(spellInput)
+		return result and 1 or result == false and 0 or result
+	end
+
+	return
+end
+
+
 local GetSpellBookItemInfo = _G.GetSpellBookItemInfo or _G.C_SpellBook.GetSpellBookItemType
 local GetSpellBookItemName = _G.GetSpellBookItemName or _G.C_SpellBook.GetSpellBookItemName
 local GetSpellLink = _G.GetSpellLink or _G.C_Spell.GetSpellLink
-local GetSpellInfo = _G.GetSpellInfo or _G.C_Spell.GetSpellName
+local GetSpellName = _G.GetSpellInfo or _G.C_Spell.GetSpellName
 
-local IsSpellInRange = _G.IsSpellInRange or function(id, unit)
-  local result = C_Spell.IsSpellInRange(id, unit)
-  if result == true then
-    return 1
-  elseif result == false then
-    return 0
-  end
-  return nil
-end
-local isTWWSpellInRange = IsSpellInRange ~= _G.IsSpellInRange
+local IsSpellInRange = _G.IsSpellInRange
 local IsSpellBookItemInRange = _G.IsSpellInRange or function(index, spellBank, unit)
   local result = C_SpellBook.IsSpellBookItemInRange(index, spellBank, unit)
   if result == true then
@@ -48,8 +76,7 @@ local IsSpellBookItemInRange = _G.IsSpellInRange or function(index, spellBank, u
   return nil
 end
 
-local SpellHasRange = _G.SpellHasRange or _G.C_Spell.SpellHasRange
-local isTWWSpellHasRange = SpellHasRange ~= _G.SpellHasRange
+local SpellHasRange = _G.SpellHasRange
 local SpellBookHasRange = _G.SpellHasRange or _G.C_SpellBook.IsSpellBookItemInRange
 
 local UnitExists = _G.UnitExists
@@ -178,7 +205,7 @@ local function UpdateBook(bookType)
 			if type == "SPELL" then
 				-- PETACTION (pet abilities) don't return a spellID for baseSpellID,
 				-- so base spells only work for proper player spells.
-				local baseSpellName = GetSpellInfo(baseSpellID)
+				local baseSpellName = GetSpellName(baseSpellID)
 				if baseSpellName and not spellsByName[strlower(baseSpellName)] then
 					spellsByName[strlower(baseSpellName)] = spellBookID
 				end
@@ -208,16 +235,12 @@ local function UpdatePetBar()
 end
 UpdatePetBar()
 
--- Handles updating spellsByName and spellsByID
-if not Lib.updaterFrame then
-	Lib.updaterFrame = CreateFrame("Frame")
-end
-Lib.updaterFrame:UnregisterAllEvents()
 Lib.updaterFrame:RegisterEvent("SPELLS_CHANGED")
 Lib.updaterFrame:RegisterEvent("PET_BAR_UPDATE")
 Lib.updaterFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+Lib.updaterFrame:RegisterEvent("CVAR_UPDATE")
 
-local function UpdateSpells(_, event)
+local function UpdateSpells(_, event, arg1)
 	if event == "PET_BAR_UPDATE" then
 		UpdatePetBar()
 	elseif event == "PLAYER_TARGET_CHANGED" then
@@ -226,11 +249,14 @@ local function UpdateSpells(_, event)
 	elseif event == "SPELLS_CHANGED" then
 		UpdateBook("spell")
 		UpdateBook("pet")
+	elseif event == "CVAR_UPDATE" and arg1 == "ShowAllSpellRanks" then
+		UpdateBook("spell")
+		UpdateBook("pet")
 	end
 end
 
 Lib.updaterFrame:SetScript("OnEvent", UpdateSpells)
-UpdateSpells()
+
 
 --- Improved spell range checking function.
 -- @name SpellRange.IsSpellInRange
@@ -267,8 +293,12 @@ function Lib.IsSpellInRange(spellInput, unit)
 				end
 			end
 		end
-		if isTWWSpellInRange then
-			return IsSpellInRange(spellInput, unit)
+
+		-- if "show all ranks" in spellbook is not ticked and the input was a lower rank of a spell, it won't exist in spellsByID_spell. 
+		-- Workaround this issue by testing by name when no result was found using spellbook
+		local name = GetSpellName(spellInput)
+		if name then
+			return IsSpellInRange(name, unit)
 		end
 	else
 		local spellInput = strlowerCache[spellInput]
@@ -322,8 +352,10 @@ function Lib.SpellHasRange(spellInput)
 				return SpellBookHasRange(spell, petBook) or petSpellHasRange[spellInput] or false
 			end
 		end
-		if isTWWSpellHasRange then
-			return SpellHasRange(spellInput)
+	
+		local name = GetSpellName(spellInput)
+		if name then
+			return SpellHasRange(name)
 		end
 	else
 		local spellInput = strlowerCache[spellInput]

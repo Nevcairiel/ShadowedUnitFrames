@@ -436,6 +436,11 @@ function Cast:UpdateCast(frame, unit, channelled, spell, displayName, icon, star
 		frame.castBar.icon:Show()
 	end
 
+	-- BigWigs Spell Name Override
+	if (BigWigsAPI and BigWigsAPI.GetSpellRename and ShadowUF.db.profile.bossmodSpellRename and spellID) then
+		spell = BigWigsAPI.GetSpellRename(spellID) or spell
+	end
+
 	-- Setup cast info
 	cast.isChannelled = channelled
 	cast.startTime = startTime / 1000

@@ -1,4 +1,4 @@
-local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+local GetSpellName = C_Spell.GetSpellName
 
 local Tags = {afkStatus = {}, offlineStatus = {}, customEvents = {}, powerMap = {}, moduleKey = "tags"}
 local tagPool, functionPool, temp, regFontStrings, powerMap = {}, {}, {}, {}, Tags.powerMap
@@ -1501,9 +1501,10 @@ local function loadAPIEvents()
 		["UnitIsPVPFreeForAll"]		= "PLAYER_FLAGS_CHANGED UNIT_FACTION",
 		["UnitCastingInfo"]			= "UNIT_SPELLCAST_START UNIT_SPELLCAST_STOP UNIT_SPELLCAST_FAILED UNIT_SPELLCAST_INTERRUPTED UNIT_SPELLCAST_DELAYED",
 		["UnitChannelInfo"]			= "UNIT_SPELLCAST_CHANNEL_START UNIT_SPELLCAST_CHANNEL_STOP UNIT_SPELLCAST_CHANNEL_INTERRUPTED UNIT_SPELLCAST_CHANNEL_UPDATE",
-		["UnitAura"]				= "UNIT_AURA",
-		["UnitBuff"]				= "UNIT_AURA",
-		["UnitDebuff"]				= "UNIT_AURA",
+		["GetAuraDataByIndex"]		= "UNIT_AURA",
+		["GetBuffDataByIndex"]		= "UNIT_AURA",
+		["GetDebuffDataByIndex"]	= "UNIT_AURA",
+		["UnitAuraBySpell"]			= "UNIT_AURA",
 		["UnitXPMax"]				= "UNIT_PET_EXPERIENCE PLAYER_XP_UPDATE PLAYER_LEVEL_UP",
 		["UnitGetTotalAbsorbs"]		= "UNIT_ABSORB_AMOUNT_CHANGED",
 		["UnitXP%("]				= "UNIT_PET_EXPERIENCE PLAYER_XP_UPDATE PLAYER_LEVEL_UP",

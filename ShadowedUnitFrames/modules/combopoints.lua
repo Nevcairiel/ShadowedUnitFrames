@@ -21,34 +21,19 @@ function Combo:GetComboPointType()
 	return "comboPoints"
 end
 
-	function Combo:GetPoints(unit)
-    if( UnitHasVehicleUI("player") and UnitHasVehiclePlayerFrameUI("player") ) then
-        local points = GetComboPoints("vehicle") -- Correct usage with one argument
-        
-        if( points == 0 ) then
-            -- Assuming you want combo points of the player's target instead of "vehicle"
-            points = GetComboPoints("player", "target") -- Use "player" as first arg and "target" as second arg
-        end
+function Combo:GetPoints(unit)
+	-- For Malygos dragons, they also self cast their CP on themselves, which is why we check CP on ourself
+	if( UnitHasVehicleUI("player") and UnitHasVehiclePlayerFrameUI("player") ) then
+		local points = GetComboPoints("vehicle", "target")
+		if( points == 0 ) then
+			points = GetComboPoints("vehicle", "vehicle")
+		end
 
-        return points
-    else
-        return UnitPower("player", cpConfig.powerType)
-    end
+		return points
+	else
+		return UnitPower("player", cpConfig.powerType)
+	end
 end
-
--- function Combo:GetPoints(unit)
-	-- -- For Malygos dragons, they also self cast their CP on themselves, which is why we check CP on ourself
-	-- if( UnitHasVehicleUI("player") and UnitHasVehiclePlayerFrameUI("player") ) then
-		-- local points = GetComboPoints("vehicle")
-		-- if( points == 0 ) then
-			-- points = GetComboPoints("vehicle", "vehicle")
-		-- end
-
-		-- return points
-	-- else
-		-- return UnitPower("player", cpConfig.powerType)
-	-- end
--- end
 
 function Combo:Update(frame, event, unit, powerType)
 	if( not event or ( unit == frame.unit or unit == frame.vehicleUnit or unit == "player" or unit == "vehicle" ) ) then

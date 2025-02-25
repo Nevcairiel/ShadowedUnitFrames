@@ -6,8 +6,8 @@ local L = ShadowUF.L
 
 ShadowUF.Config = Config
 
-local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
-local GetSpellTexture = C_Spell and  C_Spell.GetSpellTexture or function(id) return (select(3, GetSpellInfo(id))) end
+local GetSpellName = C_Spell.GetSpellName
+local GetSpellTexture = C_Spell.GetSpellTexture
 
 --[[
 	The part that makes configuration a pain when you actually try is it gets unwieldly when you're adding special code to deal with
@@ -749,6 +749,14 @@ local function loadGeneralOptions()
 								name = L["Hide tooltips in combat"],
 								desc = L["Prevents unit tooltips from showing while in combat."],
 								arg = "tooltipCombat",
+								width = "double",
+							},
+							bossmodCastNames = {
+								order = 3.1,
+								type = "toggle",
+								name = L["Use Boss Mod Cast Name overrides"],
+								desc = L["Use spell name overrides provided by boss mods (BigWigs) on the cast bars."],
+								arg = "bossmodSpellRename",
 								width = "double",
 							},
 							sep2 = {

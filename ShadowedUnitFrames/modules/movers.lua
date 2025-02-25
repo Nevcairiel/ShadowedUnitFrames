@@ -27,7 +27,7 @@ local function createConfigEnv()
 		UnitIsUnit = function(unitA, unitB) return unitB == "player" and true or false end,
 		UnitIsDeadOrGhost = function(unit) return false end,
 		UnitIsConnected = function(unit) return true end,
-		UnitLevel = function(unit) return MAX_PLAYER_LEVEL end,
+		UnitLevel = function(unit) return GetMaxLevelForPlayerExpansion() end,
 		UnitIsPlayer = function(unit) return unit ~= "boss" and unit ~= "pet" and not string.match(unit, "(%w+)pet") end,
 		UnitHealth = function(unit) return getValue("UnitHealth", unit, math.random(20000, 50000)) end,
 		UnitIsQuestBoss = function(unit) return unit == "target" or unit == "focus" end,

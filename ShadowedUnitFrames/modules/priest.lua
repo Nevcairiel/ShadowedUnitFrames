@@ -22,7 +22,7 @@ function Priest:OnLayoutApplied(frame)
 end
 
 function Priest:PowerChanged(frame)
-	local visible = UnitPowerType(frame.unit) ~= ADDITIONAL_POWER_BAR_INDEX and not frame.inVehicle
+	local visible = UnitPowerType(frame.unit) ~= Enum.PowerType.Mana and not frame.inVehicle
 	local type = visible and "RegisterUnitEvent" or "UnregisterSingleEvent"
 
 	frame[type](frame, "UNIT_POWER_FREQUENT", self, "Update")
