@@ -92,14 +92,14 @@ function IncHeal:PositionBar(frame, incAmount)
 		return
 	end
 
-	local health = UnitHealth(frame.unit)
+	local health = UnitHealth("player")
 	if( health <= 0 ) then
 		bar.total = nil
 		bar:Hide()
 		return
 	end
 
-	local maxHealth = UnitHealthMax(frame.unit)
+	local maxHealth = UnitHealthMax("player")
 	if( maxHealth <= 0 ) then
 		bar.total = nil
 		bar:Hide()
@@ -115,7 +115,7 @@ function IncHeal:PositionBar(frame, incAmount)
 		bar:SetMinMaxValues(0, maxHealth * (ShadowUF.db.profile.units[frame.unitType][self.frameKey].cap or 1.30))
 		bar:SetValue(bar.total)
 	else
-		local healthSize = bar.healthSize * (health / maxHealth)
+		local healthSize = bar.healthSize * (UnitHealth("player") / maxHealth)
 		local incSize = bar.healthSize * (incAmount / maxHealth)
 
 		if( (healthSize + incSize) > bar.maxSize ) then

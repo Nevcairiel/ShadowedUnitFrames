@@ -479,7 +479,7 @@ function Layout:SetupText(frame, config)
 	for _, fontString in pairs(frame.fontStrings) do
 		local id = fontString.configID
 		if( fontString:IsShown() ) then
-			fontString:SetWidth(fontString.availableWidth * (config.text[id].width / totalWeight[fontString.widthID]))
+			--fontString:SetWidth(fontString.availableWidth * (config.text[id].width / totalWeight[fontString.widthID]))
 			fontString:SetHeight(ShadowUF.db.profile.font.size + 1)
 
 			frame:RegisterUpdateFunc(fontString, "UpdateTags")

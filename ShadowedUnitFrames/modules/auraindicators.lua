@@ -234,8 +234,8 @@ function Indicators:UpdateIndicators(frame)
 			end
 
 			indicator:Show()
-		else
-			indicator:Hide()
+		-- else
+			-- indicator:Hide()
 		end
 	end
 end
