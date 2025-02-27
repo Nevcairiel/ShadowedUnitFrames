@@ -3878,7 +3878,7 @@ local function loadUnitOptions()
 								type = "range",
 								name = L["Group row spacing"],
 								desc = L["How much spacing should be between each new row of groups."],
-								min = -50, max = 50, step = 1,
+								min = -200, max = 200, step = 1,
 								arg = "groupSpacing",
 								hidden = function(info) return info[2] ~= "raid" or not ShadowUF.db.profile.units.raid.frameSplit end,
 							},
