@@ -8,6 +8,7 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDualSpec-1.0, LibSpellRange-1.0, UTF8, Clique
 ## X-Curse-Project-ID: 19268
 ## X-WoWI-ID: 13494
+## Category: ShadowedUnitFrames
 
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
