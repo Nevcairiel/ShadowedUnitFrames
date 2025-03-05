@@ -802,6 +802,7 @@ function ShadowUF:HideBlizzardFrames()
 	end
 
 	if( self.db.profile.hidden.boss and not active_hiddens.boss ) then
+	hideBlizzardFrames(false, BossTargetFrameContainer)
 		for i=1, MAX_BOSS_FRAMES do
 			local name = "Boss" .. i .. "TargetFrame"
 			if _G[name].TargetFrameContent then
