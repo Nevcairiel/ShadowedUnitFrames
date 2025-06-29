@@ -477,19 +477,16 @@ function Layout:SetupText(frame, config)
 
 	-- Now set all of the width using our weightings
 	for _, fontString in pairs(frame.fontStrings) do
-    local id = fontString.configID
-    if( fontString:IsShown() ) then
-        if totalWeight[fontString.widthID] ~= 0 then
-            fontString:SetWidth(fontString.availableWidth * (config.text[id].width / totalWeight[fontString.widthID]))
-        else
-            fontString:SetWidth(fontString.availableWidth) -- Or a default value
-        end
-        fontString:SetHeight(ShadowUF.db.profile.font.size + 1)
-        frame:RegisterUpdateFunc(fontString, "UpdateTags")
-    else
-        frame:UnregisterAll(fontString)
-    end
-end
+		local id = fontString.configID
+		if( fontString:IsShown() ) then
+			--fontString:SetWidth(fontString.availableWidth * (config.text[id].width / totalWeight[fontString.widthID]))
+			fontString:SetHeight(ShadowUF.db.profile.font.size + 1)
+
+			frame:RegisterUpdateFunc(fontString, "UpdateTags")
+		else
+			frame:UnregisterAll(fontString)
+		end
+	end
 end
 
 -- Setup the bar barOrder/info
