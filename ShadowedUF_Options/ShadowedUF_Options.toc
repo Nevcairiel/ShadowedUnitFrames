@@ -1,4 +1,4 @@
-## Interface: 110105, 110107
+## Interface: 110200
 ## Title: Shadowed UF (Options)
 ## Notes: Configuration for Shadowed Unit Frames.
 ## Author: Shadowed
