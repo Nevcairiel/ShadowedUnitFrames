@@ -699,20 +699,9 @@ local function hideBlizzardFrames(taint, ...)
 
 		if( taint ) then
 			frame.Show = ShadowUF.noop
-		elseif not( EditModeManagerFrame ) then
+		else
 			frame:SetParent(ShadowUF.hiddenFrame)
 			frame:HookScript("OnShow", rehideFrame)
-		else
-			local old_parent = frame:GetParent()
-			EditModeManagerFrame:HookScript("OnShow", function(self)
-				frame:SetParent(old_parent)
-				end
-			)
-			EditModeManagerFrame:HookScript("OnHide", function(self)
-				frame:SetParent(ShadowUF.hiddenFrame)
-				rehideFrame(frame)
-				end
-			)
 		end
 	end
 end
@@ -813,6 +802,7 @@ function ShadowUF:HideBlizzardFrames()
 	end
 
 	if( self.db.profile.hidden.boss and not active_hiddens.boss ) then
+	hideBlizzardFrames(false, BossTargetFrameContainer)
 		for i=1, MAX_BOSS_FRAMES do
 			local name = "Boss" .. i .. "TargetFrame"
 			if _G[name].TargetFrameContent then
