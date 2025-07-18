@@ -590,7 +590,8 @@ Tags.defaultTags = {
 		return string.format("%s%s|r", color, name)
 	end]],
 	["curpp"] = [[function(unit, unitOwner)
-		if( UnitPowerMax(unit) <= 0 ) then
+		local powerType = UnitPowerType(unit)
+		if( UnitPowerMax(unit, powerType) <= 0 ) then
 			return nil
 		elseif( UnitIsDeadOrGhost(unit) ) then
 			return 0
@@ -644,7 +645,8 @@ Tags.defaultTags = {
 	end]],
 	["absmaxhp"] = [[function(unit, unitOwner) return UnitHealthMax(unit) end]],
 	["abscurpp"] = [[function(unit, unitOwner)
-		if( UnitPowerMax(unit) <= 0 ) then
+		local powerType = UnitPowerType(unit)
+		if( UnitPowerMax(unit, powerType) <= 0 ) then
 			return nil
 		elseif( UnitIsDeadOrGhost(unit) ) then
 			return 0
@@ -653,11 +655,13 @@ Tags.defaultTags = {
 		return UnitPower(unit)
 	end]],
 	["absmaxpp"] = [[function(unit, unitOwner)
-		local power = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local power = UnitPowerMax(unit, powerType)
 		return power > 0 and power or nil
 	end]],
 	["absolutepp"] = [[function(unit, unitOwner)
-		local maxPower = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local maxPower = UnitPowerMax(unit, powerType)
 		local power = UnitPower(unit)
 		if( UnitIsDeadOrGhost(unit) ) then
 			return string.format("0/%s", maxPower)
@@ -668,7 +672,8 @@ Tags.defaultTags = {
 		return string.format("%s/%s", power, maxPower)
 	end]],
 	["curmaxpp"] = [[function(unit, unitOwner)
-		local maxPower = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local maxPower = UnitPowerMax(unit, powerType)
 		local power = UnitPower(unit)
 		if( UnitIsDeadOrGhost(unit) ) then
 			return string.format("0/%s", ShadowUF:FormatLargeNumber(maxPower))
@@ -679,7 +684,8 @@ Tags.defaultTags = {
 		return string.format("%s/%s", ShadowUF:FormatLargeNumber(power), ShadowUF:FormatLargeNumber(maxPower))
 	end]],
 	["smart:curmaxpp"] = [[function(unit, unitOwner)
-		local maxPower = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local maxPower = UnitPowerMax(unit, powerType)
 		local power = UnitPower(unit)
 		if( UnitIsDeadOrGhost(unit) ) then
 			return string.format("0/%s", maxPower)
@@ -713,7 +719,8 @@ Tags.defaultTags = {
 	end]],
 	["maxhp"] = [[function(unit, unitOwner) return ShadowUF:FormatLargeNumber(UnitHealthMax(unit)) end]],
 	["maxpp"] = [[function(unit, unitOwner)
-		local power = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local power = UnitPowerMax(unit, powerType)
 		if( power <= 0 ) then
 			return nil
 		elseif( UnitIsDeadOrGhost(unit) ) then
@@ -736,7 +743,8 @@ Tags.defaultTags = {
 		return "-" .. ShadowUF:FormatLargeNumber(missing)
 	end]],
 	["missingpp"] = [[function(unit, unitOwner)
-		local power = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local power = UnitPowerMax(unit, powerType)
 		if( power <= 0 ) then
 			return nil
 		end
@@ -769,7 +777,8 @@ Tags.defaultTags = {
 		return math.floor(UnitHealth(unit) / max * 100 + 0.5) .. "%"
 	end]],
 	["perpp"] = [[function(unit, unitOwner)
-		local maxPower = UnitPowerMax(unit)
+		local powerType = UnitPowerType(unit)
+		local maxPower = UnitPowerMax(unit, powerType)
 		if( maxPower <= 0 ) then
 			return nil
 		elseif( UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) ) then
