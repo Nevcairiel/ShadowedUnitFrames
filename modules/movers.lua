@@ -27,7 +27,7 @@ local function createConfigEnv()
 		UnitIsUnit = function(unitA, unitB) return unitB == "player" and true or false end,
 		UnitIsDeadOrGhost = function(unit) return false end,
 		UnitIsConnected = function(unit) return true end,
-		UnitLevel = function(unit) return GetMaxLevelForPlayerExpansion() end,
+		UnitLevel = function(unit) return GetMaxPlayerLevel() end,
 		UnitIsPlayer = function(unit) return unit ~= "boss" and unit ~= "pet" and not string.match(unit, "(%w+)pet") end,
 		UnitHealth = function(unit) return getValue("UnitHealth", unit, math.random(20000, 50000)) end,
 		UnitIsQuestBoss = function(unit) return unit == "target" or unit == "focus" end,
@@ -42,12 +42,20 @@ local function createConfigEnv()
 		end,
 		UnitHealthMax = function(unit) return 50000 end,
 		UnitPower = function(unit, powerType)
-			if( powerType == Enum.PowerType.HolyPower or powerType == Enum.PowerType.SoulShards or powerType == Enum.PowerType.Essence ) then
+			if( powerType == Enum.PowerType.HolyPower or powerType == Enum.PowerType.SoulShards or powerType == Enum.PowerType.Essence or powerType == Enum.PowerType.ShadowOrbs ) then
 				return 3
+			elseif( powerType == Enum.PowerType.Balance ) then
+				return getValue("UnitPower", unit, math.random(-100, 100))
 			elseif( powerType == Enum.PowerType.Chi) then
 				return 4
+			elseif( powerType == Enum.PowerType.ShadowOrbs ) then
+				return PRIEST_BAR_NUM_ORBS
+			elseif( powerType == Enum.PowerType.BurningEmbers ) then
+				return math.floor(MAX_POWER_PER_EMBER + (MAX_POWER_PER_EMBER / 2))
+			elseif( powerType == Enum.PowerType.DemonicFury ) then
+				return 100
 			end
-
+			
 			return getValue("UnitPower", unit, math.random(20000, 50000))
 		end,
 		UnitGetTotalHealAbsorbs = function(unit)
@@ -61,8 +69,8 @@ local function createConfigEnv()
 		end,
 		UnitPowerMax = function(unit, powerType)
 			if( powerType == Enum.PowerType.Rage or powerType == Enum.PowerType.Energy or powerType == Enum.PowerType.RunicPower
-			 or powerType == Enum.PowerType.LunarPower or powerType == Enum.PowerType.Maelstrom or powerType == Enum.PowerType.Insanity
-			 or powerType == Enum.PowerType.Fury or powerType == Enum.PowerType.Pain ) then
+			 or powerType == Enum.PowerType.Maelstrom or powerType == Enum.PowerType.Insanity
+			 or powerType == Enum.PowerType.Fury or powerType == Enum.PowerType.Pain or powerType == Enum.PowerType.Balance ) then
 				return 100
 			elseif( powerType == Enum.PowerType.Focus ) then
 				return 120
@@ -73,8 +81,14 @@ local function createConfigEnv()
 				return 6
 			elseif( powerType == Enum.PowerType.ArcaneCharges ) then
 				return 4
+		elseif( powerType == Enum.PowerType.ShadowOrbs ) then
+				return PRIEST_BAR_NUM_ORBS
+			elseif( powerType == Enum.PowerType.BurningEmbers ) then
+				return MAX_POWER_PER_EMBER * 3
+			elseif( powerType == Enum.PowerType.DemonicFury ) then
+				return 100
 			end
-
+			
 			return 50000
 		end,
 		UnitHasIncomingResurrection = function(unit) return true end,

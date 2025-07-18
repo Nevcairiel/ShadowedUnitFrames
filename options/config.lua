@@ -615,7 +615,16 @@ local function loadGeneralOptions()
 									layout.units[unit] = nil
 								end
 							end
-
+							if( not layoutData.modules ) then
+								local validModules = {["healthBar"] = true, ["powerBar"] = true, ["portrait"] = true, ["range"] = true, ["text"] = true, ["indicators"] = true, ["auras"] = true, ["incAbsorb"] = true, ["healAbsorb"] = true, ["incHeal"] = true, ["castBar"] = true, ["combatText"] = true, ["highlight"] = true, ["runeBar"] = true, ["totemBar"] = true, ["xpBar"] = true, ["fader"] = true, ["comboPoints"] = true, ["eclipseBar"] = true, ["soulShards"] = true, ["holyPower"] = true, ["altPowerBar"] = true, ["demonicFuryBar"] = true, ["burningEmbersBar"] = true, ["chi"] = true, ["shadowOrbs"] = true, ["auraPoints"] = true, ["staggerBar"] = true}
+								for _, unitData in pairs(layout.units) do
+									for key, data in pairs(unitData) do
+										if( type(data) == "table" and not validModules[key] and ShadowUF.modules[key] ) then
+											unitData[key] = nil
+										end
+									end
+								end
+							end
 							-- Check if we need move over the visibility and positions info
 							layout.positions = layout.positions or CopyTable(ShadowUF.db.profile.positions)
 							layout.visibility = layout.visibility or CopyTable(ShadowUF.db.profile.positions)
@@ -1164,6 +1173,22 @@ local function loadGeneralOptions()
 								name = L["Runic Power"],
 								arg = "powerColors.RUNIC_POWER",
 							},
+							ECLIPSE_MOON = {
+								order = 7,
+								type = "color",
+								name = L["Eclipse (Moon)"],
+								desc = L["Bar coloring for the moon portion of the eclipse bar."],
+								hidden = function(info) return select(2, UnitClass("player")) ~= "DRUID" end,
+								arg = "powerColors.ECLIPSE_MOON",
+							},
+							ECLIPSE_SUN = {
+								order = 8,
+								type = "color",
+								name = L["Eclipse (Sun)"],
+								desc = L["Bar coloring for the moon portion of the eclipse bar."],
+								hidden = function(info) return select(2, UnitClass("player")) ~= "DRUID" end,
+								arg = "powerColors.ECLIPSE_SUN",
+							},
 							RUNES = {
 								order = 7,
 								type = "color",
@@ -1198,25 +1223,33 @@ local function loadGeneralOptions()
 								arg = "powerColors.AURAPOINTS",
 								hidden = function() return not ShadowUF.modules.auraPoints end
 							},
-							INSANITY = {
+							SHADOWORBS = {
 								order = 12,
 								type = "color",
-								name = L["Insanity"],
-								arg = "powerColors.INSANITY",
+								name = L["Shadow Orbs"],
+								arg = "powerColors.SHADOWORBS",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "PRIEST" end,
 							},
 							MAELSTROM = {
-								order = 12,
+								order = 12.5,
 								type = "color",
 								name = L["Maelstrom"],
 								arg = "powerColors.MAELSTROM",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "SHAMAN" end,
 							},
 							HOLYPOWER = {
-								order = 12,
+								order = 12.5,
 								type = "color",
 								name = L["Holy Power"],
 								arg = "powerColors.HOLYPOWER",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "PALADIN" end,
+							},
+							BANKEDHOLYPOWER = {
+								order = 13,
+								type = "color",
+								name = L["Banked Holy Power"],
+								hasAlpha = true,
+								arg = "powerColors.BANKEDHOLYPOWER",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "PALADIN" end,
 							},
 							SOULSHARDS = {
@@ -1225,6 +1258,28 @@ local function loadGeneralOptions()
 								name = L["Soul Shards"],
 								hasAlpha = true,
 								arg = "powerColors.SOULSHARDS",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "WARLOCK" end,
+							},
+							DEMONICFURY = {
+								order = 15,
+								type = "color",
+								name = L["Demonic Fury"],
+								arg = "powerColors.DEMONICFURY",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "WARLOCK" end,
+							},
+							BURNINGEMBERS = {
+								order = 16,
+								type = "color",
+								name = L["Burning Embers"],
+								arg = "powerColors.BURNINGEMBERS",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "WARLOCK" end,
+							},
+							FULLBURNINGEMBER = {
+								order = 16,
+								type = "color",
+								name = L["Full Burning Ember"],
+						
+								arg = "powerColors.FULLBURNINGEMBER",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "WARLOCK" end,
 							},
 							ARCANECHARGES = {
@@ -1241,20 +1296,6 @@ local function loadGeneralOptions()
 								name = L["Chi"],
 								arg = "powerColors.CHI",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "MONK" end,
-							},
-							FURY = {
-								order = 17,
-								type = "color",
-								name = L["Fury"],
-								arg = "powerColors.FURY",
-								hidden = function(info) return select(2, UnitClass("player")) ~= "DEMONHUNTER" end,
-							},
-							PAIN = {
-								order = 17,
-								type = "color",
-								name = L["Pain"],
-								arg = "powerColors.PAIN",
-								hidden = function(info) return select(2, UnitClass("player")) ~= "DEMONHUNTER" end,
 							},
 							LUNAR_POWER = {
 								order = 17,
@@ -2438,7 +2479,7 @@ local function loadUnitOptions()
 				hidden = hideBarOption,
 				arg = "$parent.background",
 			},
-			sep2 = {order = 1.55, type = "description", name = "", hidden = function(info) return not (not ShadowUF.modules[info[#(info) - 1]] or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints) end},
+			sep2 = {order = 1.55, type = "description", name = "", hidden = function(info) return not (not ShadowUF.modules[info[#(info) - 1]] or info[#(info) - 1] == "eclipseBar" or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints) end},
 			overrideBackground = {
 				order = 1.6,
 				type = "toggle",
@@ -2504,10 +2545,10 @@ local function loadUnitOptions()
 				type = "toggle",
 				name = L["Invert colors"],
 				desc = L["Flips coloring so the bar color is shown as the background color and the background as the bar"],
-				hidden = function(info) return not ShadowUF.modules[info[#(info) - 1]] or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints end,
+				hidden = function(info) return not ShadowUF.modules[info[#(info) - 1]] or info[#(info) - 1] == "eclipseBar" or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints end,
 				arg = "$parent.invert",
 			},
-			sep3 = {order = 3, type = "description", name = "", hidden = function(info) return not ShadowUF.modules[info[#(info) - 1]] or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints end,},
+			sep3 = {order = 3, type = "description", name = "", hidden = function(info) return not ShadowUF.modules[info[#(info) - 1]] or info[#(info) - 1] == "eclipseBar" or not ShadowUF.db.profile.advanced or ShadowUF.modules[info[#(info) - 1]].isComboPoints end,},
 			order = {
 				order = 4,
 				type = "range",
@@ -3191,7 +3232,7 @@ local function loadUnitOptions()
 						order = 4,
 						type = "group",
 						inline = true,
-						name = L["Holy Power"],
+						name = L["Shadow Orbs"],
 						hidden = function(info) if( info[2] == "global" or getVariable(info[2], "shadowOrbs", nil, "isBar") ) then return true end return hideRestrictedOption(info) end,
 						args = {
 							enabled = {
@@ -3878,7 +3919,7 @@ local function loadUnitOptions()
 								type = "range",
 								name = L["Group row spacing"],
 								desc = L["How much spacing should be between each new row of groups."],
-								min = -50, max = 50, step = 1,
+								min = -200, max = 200, step = 1,
 								arg = "groupSpacing",
 								hidden = function(info) return info[2] ~= "raid" or not ShadowUF.db.profile.units.raid.frameSplit end,
 							},
@@ -4168,7 +4209,7 @@ local function loadUnitOptions()
 						hidden = function(info)
 							local unit = info[2]
 							if( unit == "global" ) then
-								return not globalConfig.runeBar and not globalConfig.totemBar and not globalConfig.druidBar and not globalConfig.priestBar and not globalConfig.shamanBar and not globalConfig.xpBar and not globalConfig.staggerBar
+								return not globalConfig.runeBar and not globalConfig.eclipseBar and not globalConfig.totemBar and not globalConfig.monkBar and not globalConfig.xpBar and not globalConfig.demonicFuryBar and not globalConfig.burningEmbersBar and not globalConfig.staggerBar
 							else
 								return unit ~= "player" and unit ~= "pet"
 							end
@@ -4181,6 +4222,40 @@ local function loadUnitOptions()
 								desc = L["Adds rune bars and timers before runes refresh to the player frame."],
 								hidden = hideRestrictedOption,
 								arg = "runeBar.enabled",
+							},
+							eclipseBar = {
+								order = 1.25,
+								type = "toggle",
+								name = string.format(L["Enable %s"], L["Eclipse bar"]),
+								desc = L["Adds eclipse bars and how far into sun or moon eclipse is."],
+								hidden = hideRestrictedOption,
+								arg = "eclipseBar.enabled",
+							},
+							demonicFuryBar = {
+								order = 1.25,
+								type = "toggle",
+								name = string.format(L["Enable %s"], L["Demonic Fury bar"]),
+								desc = L["Adds a Demonic Fury bar for Demonology Warlocks."],
+								hidden = hideRestrictedOption,
+								arg = "demonicFuryBar.enabled",
+							},
+							burningEmbersBar = {
+								order = 1.25,
+								type = "toggle",
+								name = string.format(L["Enable %s"], L["Burning Embers bar"]),
+								desc = L["Adds a Burning Embers bar for Destruction Warlocks."],
+								hidden = hideRestrictedOption,
+								arg = "burningEmbersBar.enabled",
+							},
+							totemBar = {
+								order = 1.5,
+								type = "toggle",
+								name = string.format(L["Enable %s"], ShadowUF.modules.totemBar.moduleName),
+								desc = function(info)
+									return select(2, UnitClass("player")) == "SHAMAN" and L["Adds totem bars with timers before they expire to the player frame."] or select(2, UnitClass("player")) == "DEATHKNIGHT" and L["Adds a bar indicating how much time is left on your ghoul timer, only used if you do not have a permanent ghoul."] or L["Adds a bar indicating how much time is left on your mushrooms."]
+								end,
+								hidden = hideRestrictedOption,
+								arg = "totemBar.enabled",
 							},
 							staggerBar = {
 								order = 1.25,

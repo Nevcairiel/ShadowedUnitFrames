@@ -86,21 +86,20 @@ end
 
 function XP:UpdateRep(frame)
 	if( not frame.xpBar.rep ) then return end
-	local factionData = C_Reputation.GetWatchedFactionData()
-	if( not factionData ) then
+	local name, reaction, min, max, current = GetWatchedFactionInfo()
+	if( not name ) then
 		frame.xpBar.rep:Hide()
 		return
 	end
-
+	
 	-- Blizzard stores faction info related to Exalted, not your current level, so get more mathier to find the current reputation using the current standing tier
-	local min, max, current = factionData.currentReactionThreshold, factionData.nextReactionThreshold, factionData.currentStanding
 	current = math.abs(min - current)
 	max = math.abs(min - max)
-
-	local color = FACTION_BAR_COLORS[factionData.reaction]
+	
+	local color = FACTION_BAR_COLORS[reaction]
 	frame.xpBar.rep:SetMinMaxValues(0, max)
 	frame.xpBar.rep:SetValue(current)
-	frame.xpBar.rep.tooltip = string.format(L["%s (%s): %s/%s (%.2f%% done)"], factionData.name, GetText("FACTION_STANDING_LABEL" .. tostring(factionData.reaction), UnitSex("player")), formatNumber(current), formatNumber(max), (max > 0 and current / max or 0) * 100)
+	frame.xpBar.rep.tooltip = string.format(L["%s (%s): %s/%s (%.2f%% done)"], name, GetText("FACTION_STANDING_LABEL" .. reaction, UnitSex("player")), formatNumber(current), formatNumber(max), (max > 0 and current / max or 0) * 100)
 	frame.xpBar.rep:SetStatusBarColor(color.r, color.g, color.b, ShadowUF.db.profile.bars.alpha)
 	frame.xpBar.rep.background:SetVertexColor(color.r, color.g, color.b, ShadowUF.db.profile.bars.backgroundAlpha)
 	frame.xpBar.rep:Show()
@@ -108,7 +107,7 @@ end
 
 function XP:UpdateXP(frame)
 	-- At the level cap or XP is disabled, or the pet is actually a vehicle right now, swap to reputation bar (or hide it)
-	if( UnitLevel(frame.unitOwner) == GetMaxLevelForPlayerExpansion() or IsXPUserDisabled() or ( frame.unitOwner == "pet" and UnitExists("vehicle") ) ) then
+	if( UnitLevel(frame.unitOwner) == MAX_PLAYER_LEVEL or IsXPUserDisabled() or ( frame.unitOwner == "pet" and UnitExists("vehicle") ) ) then
 		frame.xpBar.xp:Hide()
 		return
 	end

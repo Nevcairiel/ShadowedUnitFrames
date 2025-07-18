@@ -13,7 +13,7 @@ local Range = {
 		["PALADIN"] = GetSpellName(19750), -- Flash of Light
 		["SHAMAN"] = GetSpellName(8004), -- Healing Surge
 		["WARLOCK"] = GetSpellName(5697), -- Unending Breath
-		--["DEATHKNIGHT"] = GetSpellName(47541), -- Death Coil
+		["DEATHKNIGHT"] = GetSpellName(47541), -- Death Coil
 		["MONK"] = GetSpellName(115450), -- Detox
 	},
 	hostile = {
@@ -50,15 +50,6 @@ local LSR = LibStub("SpellRange-1.0")
 local playerClass = select(2, UnitClass("player"))
 local rangeSpells = {}
 
-local UnitPhaseReason_o = UnitPhaseReason
-local UnitPhaseReason = function(unit)
-	local phase = UnitPhaseReason_o(unit)
-	if (phase == Enum.PhaseReason.WarMode or phase == Enum.PhaseReason.ChromieTime) and UnitIsVisible(unit) then
-		return nil
-	end
-	return phase
-end
-
 local function checkRange(self)
 	local frame = self.parent
 
@@ -70,14 +61,14 @@ local function checkRange(self)
 		spell = rangeSpells.hostile
 	end
 
-	if( not UnitIsConnected(frame.unit) or UnitPhaseReason(frame.unit) ) then
+	if( not UnitIsConnected(frame.unit) or not UnitInPhase(frame.unit) ) then
 		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	elseif( spell ) then
 		frame:SetRangeAlpha(LSR.IsSpellInRange(spell, frame.unit) == 1 and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	-- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
 	elseif( UnitInRaid(frame.unit) or UnitInParty(frame.unit) ) then
 		frame:SetRangeAlpha(UnitInRange(frame.unit, "player") and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
-	-- Nope, just show in range :(
+	-- Nope, fall back to interaction :(
 	else
 		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.inAlpha)
 	end
@@ -85,22 +76,22 @@ end
 
 local function updateSpellCache(category)
 	rangeSpells[category] = nil
-	if( ShadowUF.db.profile.range[category .. playerClass] and IsSpellUsable(ShadowUF.db.profile.range[category .. playerClass]) ) then
+	if( IsUsableSpell(ShadowUF.db.profile.range[category .. playerClass]) ) then
 		rangeSpells[category] = ShadowUF.db.profile.range[category .. playerClass]
 
-	elseif( ShadowUF.db.profile.range[category .. "Alt" .. playerClass] and IsSpellUsable(ShadowUF.db.profile.range[category .. "Alt" .. playerClass]) ) then
+	elseif( IsUsableSpell(ShadowUF.db.profile.range[category .. "Alt" .. playerClass]) ) then
 		rangeSpells[category] = ShadowUF.db.profile.range[category .. "Alt" .. playerClass]
 
 	elseif( Range[category][playerClass] ) then
 		if( type(Range[category][playerClass]) == "table" ) then
 			for i = 1, #Range[category][playerClass] do
 				local spell = Range[category][playerClass][i]
-				if( spell and IsSpellUsable(spell) ) then
+				if( IsUsableSpell(spell) ) then
 					rangeSpells[category] = spell
 					break
 				end
 			end
-		elseif( Range[category][playerClass] and IsSpellUsable(Range[category][playerClass]) ) then
+		elseif( IsUsableSpell(Range[category][playerClass]) ) then
 			rangeSpells[category] = Range[category][playerClass]
 		end
 	end
@@ -135,7 +126,7 @@ function Range:OnEnable(frame)
 		frame.range = CreateFrame("Frame", nil, frame)
 	end
 
-	frame:RegisterNormalEvent("PLAYER_SPECIALIZATION_CHANGED", self, "SpellChecks")
+	frame:RegisterNormalEvent("CHARACTER_POINTS_CHANGED", self, "SpellChecks")
 	frame:RegisterUpdateFunc(self, "ForceUpdate")
 
 	createTimer(frame)
@@ -158,7 +149,7 @@ end
 function Range:SpellChecks(frame)
 	updateSpellCache("friendly")
 	updateSpellCache("hostile")
-	if( frame.range and ShadowUF.db.profile.units[frame.unitType].range.enabled ) then
+	if( frame.range ) then
 		self:ForceUpdate(frame)
 	end
 end

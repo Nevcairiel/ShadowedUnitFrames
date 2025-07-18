@@ -13,6 +13,7 @@ local _G = getfenv(0)
 
 ShadowUF.Units = Units
 ShadowUF:RegisterModule(Units, "units")
+local GetSpecialization = C_SpecializationInfo.GetSpecialization or _G.GetSpecialization
 
 -- This is the wrapper frame that everything parents to so we can just hide it when we need to deal with pet battles
 local petBattleFrame = CreateFrame("Frame", "SUFWrapperFrame", UIParent, "SecureHandlerBaseTemplate")
@@ -642,7 +643,7 @@ local secureInitializeUnit = [[
 	end
 ]]
 
-local unitButtonTemplate = ClickCastHeader and ("ClickCastUnitTemplate,SUF_SecureUnitTemplate,PingableUnitFrameTemplate,BackdropTemplate") or ("SUF_SecureUnitTemplate,PingableUnitFrameTemplate,BackdropTemplate")
+local unitButtonTemplate = ClickCastHeader and (BackdropTemplateMixin and "ClickCastUnitTemplate,SUF_SecureUnitTemplate,BackdropTemplate" or "ClickCastUnitTemplate,SUF_SecureUnitTemplate") or (BackdropTemplateMixin and "SUF_SecureUnitTemplate,BackdropTemplate" or "SUF_SecureUnitTemplate")
 
 -- Header unit initialized
 local function initializeUnit(header, frameName)
@@ -727,6 +728,13 @@ function Units:CreateUnit(...)
 
 	frame.OnEnter = SUF_OnEnter
 	frame.OnLeave = SUF_OnLeave
+	
+	if (PingUtil) then
+		frame:SetToplevel(true)
+		frame:SetAttribute("ping-receiver", true)
+		frame.IsPingable = true
+		Mixin(frame, PingableType_UnitFrameMixin)
+	end
 
 	frame:RegisterForClicks("AnyUp")
 	-- non-header frames don't set those, so we need to do it
@@ -960,7 +968,7 @@ function Units:LoadUnit(unit)
 		return
 	end
 
-	local frame = self:CreateUnit("Button", "SUFUnit" .. unit, petBattleFrame, "SecureUnitButtonTemplate,PingableUnitFrameTemplate,BackdropTemplate")
+	local frame = self:CreateUnit("Button", "SUFUnit" .. unit, petBattleFrame, BackdropTemplateMixin and "SecureUnitButtonTemplate,BackdropTemplate" or "SecureUnitButtonTemplate")
 	frame:SetAttribute("unit", unit)
 	frame.hasStateWatch = unit == "pet"
 
@@ -1188,7 +1196,7 @@ function Units:LoadZoneHeader(type)
 	end
 
 	for id, unit in pairs(ShadowUF[type .. "Units"]) do
-		local frame = self:CreateUnit("Button", "SUFHeader" .. type .. "UnitButton" .. id, headerFrame, "SecureUnitButtonTemplate,PingableUnitFrameTemplate,BackdropTemplate")
+		local frame = self:CreateUnit("Button", "SUFHeader" .. type .. "UnitButton" .. id, headerFrame, BackdropTemplateMixin and "SecureUnitButtonTemplate,BackdropTemplate" or "SecureUnitButtonTemplate")
 		frame.ignoreAnchor = true
 		frame.hasStateWatch = true
 		frame.unitUnmapped = type .. id
@@ -1304,7 +1312,7 @@ function Units:LoadChildUnit(parent, type, id)
 	end
 
 	-- Now we can create the actual frame
-	local frame = self:CreateUnit("Button", "SUFChild" .. type .. string.match(parent:GetName(), "(%d+)"), parent, "SecureUnitButtonTemplate,PingableUnitFrameTemplate,BackdropTemplate")
+	local frame = self:CreateUnit("Button", "SUFChild" .. type .. string.match(parent:GetName(), "(%d+)"), parent, BackdropTemplateMixin and "SecureUnitButtonTemplate,BackdropTemplate" or "SecureUnitButtonTemplate")
 	frame.unitType = type
 	frame.parent = parent
 	frame.isChildUnit = true

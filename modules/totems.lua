@@ -17,9 +17,9 @@ elseif( playerClass == "MONK" ) then
 elseif( playerClass == "MAGE" ) then
 	MAX_TOTEMS = 1
 	ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Rune of Power bar"], true, "MAGE", {1, 2, 3}, 30)
-elseif( playerClass == "WARLOCK" ) then
-	MAX_TOTEMS = 2
-	ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Imp & Dreadstalker bar"], true, "WARLOCK", 2)
+-- elseif( playerClass == "WARLOCK" ) then
+	-- MAX_TOTEMS = 2
+	-- ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Imp & Dreadstalker bar"], true, "WARLOCK", 2)
 else
 	ShadowUF:RegisterModule(Totems, "totemBar", ShadowUF.L["Totem bar"], true, "SHAMAN")
 end
@@ -59,9 +59,9 @@ function Totems:OnEnable(frame)
 			totemColors[1] = ShadowUF.db.profile.classColors.PET
 		elseif( playerClass == "DRUID" ) then
 			totemColors[1] = ShadowUF.db.profile.powerColors.MUSHROOMS
-		elseif( playerClass == "WARLOCK" ) then
-			totemColors[1] = ShadowUF.db.profile.classColors.PET
-			totemColors[2] = ShadowUF.db.profile.classColors.PET
+		-- elseif( playerClass == "WARLOCK" ) then
+			-- totemColors[1] = ShadowUF.db.profile.classColors.PET
+			-- totemColors[2] = ShadowUF.db.profile.classColors.PET
 		elseif( playerClass == "MONK" ) then
 			totemColors[1] = ShadowUF.db.profile.powerColors.STATUE
 		elseif( playerClass == "MAGE" ) then

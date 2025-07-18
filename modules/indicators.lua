@@ -1,4 +1,4 @@
-local Indicators = {list = {"status", "pvp", "leader", "resurrect", "sumPending", "masterLoot", "raidTarget", "ready", "role", "lfdRole", "class", "phase", "questBoss", "petBattle", "arenaSpec"}}
+local Indicators = {list = {"status", "pvp", "leader", "resurrect", "masterLoot", "raidTarget", "ready", "role", "class", "phase", "happiness" }}
 
 ShadowUF:RegisterModule(Indicators, "indicators", ShadowUF.L["Indicators"])
 
@@ -32,7 +32,7 @@ end
 function Indicators:UpdatePhase(frame)
     if( not frame.indicators.phase or not frame.indicators.phase.enabled ) then return end
 
-    if( UnitIsConnected(frame.unit) and UnitPhaseReason(frame.unit) ) then
+    if( UnitIsConnected(frame.unit) and not UnitInPhase(frame.unit) ) then
         frame.indicators.phase:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
         frame.indicators.phase:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
         frame.indicators.phase:Show()
@@ -51,29 +51,29 @@ function Indicators:UpdateResurrect(frame)
     end
 end
 
-function Indicators:SummonPending(frame)
-	if( not frame.indicators.sumPending or not frame.indicators.sumPending.enabled ) then return end
+-- function Indicators:SummonPending(frame)
+	-- if( not frame.indicators.sumPending or not frame.indicators.sumPending.enabled ) then return end
 
-	if( C_IncomingSummon.HasIncomingSummon(frame.unit) ) then
-		if( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 1 ) then
-			frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
-			frame.indicators.sumPending:SetTexCoord(0.539062, 0.789062, 0.015625, 0.515625)
-			frame.indicators.sumPending:Show()
-		elseif( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 2 ) then
-			frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
-			frame.indicators.sumPending:SetTexCoord(0.0078125, 0.257812, 0.015625, 0.515625)
-			frame.indicators.sumPending:Show()
-		elseif( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 3 ) then
-			frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
-			frame.indicators.sumPending:SetTexCoord(0.273438, 0.523438, 0.015625, 0.515625)
-			frame.indicators.sumPending:Show()
-		else
-			frame.indicators.sumPending:Hide()
-		end
-	else
-		frame.indicators.sumPending:Hide()
-	end
-end
+	-- if( C_IncomingSummon.HasIncomingSummon(frame.unit) ) then
+		-- if( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 1 ) then
+			-- frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
+			-- frame.indicators.sumPending:SetTexCoord(0.539062, 0.789062, 0.015625, 0.515625)
+			-- frame.indicators.sumPending:Show()
+		-- elseif( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 2 ) then
+			-- frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
+			-- frame.indicators.sumPending:SetTexCoord(0.0078125, 0.257812, 0.015625, 0.515625)
+			-- frame.indicators.sumPending:Show()
+		-- elseif( C_IncomingSummon.IncomingSummonStatus(frame.unit) == 3 ) then
+			-- frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
+			-- frame.indicators.sumPending:SetTexCoord(0.273438, 0.523438, 0.015625, 0.515625)
+			-- frame.indicators.sumPending:Show()
+		-- else
+			-- frame.indicators.sumPending:Hide()
+		-- end
+	-- else
+		-- frame.indicators.sumPending:Hide()
+	-- end
+-- end
 
 
 function Indicators:UpdateMasterLoot(frame)
@@ -100,15 +100,15 @@ function Indicators:UpdateRaidTarget(frame)
 	end
 end
 
-function Indicators:UpdateQuestBoss(frame)
-	if( not frame.indicators.questBoss or not frame.indicators.questBoss.enabled ) then return end
+-- function Indicators:UpdateQuestBoss(frame)
+	-- if( not frame.indicators.questBoss or not frame.indicators.questBoss.enabled ) then return end
 
-	if( UnitIsQuestBoss(frame.unit) ) then
-		frame.indicators.questBoss:Show()
-	else
-		frame.indicators.questBoss:Hide()
-	end
-end
+	-- if( UnitIsQuestBoss(frame.unit) ) then
+		-- frame.indicators.questBoss:Show()
+	-- else
+		-- frame.indicators.questBoss:Hide()
+	-- end
+-- end
 
 function Indicators:UpdateLFDRole(frame, event)
 	if( not frame.indicators.lfdRole or not frame.indicators.lfdRole.enabled ) then return end
@@ -241,6 +241,19 @@ function Indicators:UpdateStatus(frame)
 	end
 end
 
+-- Ready check fading once the check complete
+local function fadeReadyStatus(self, elapsed)
+	self.timeLeft = self.timeLeft - elapsed
+	self.ready:SetAlpha(self.timeLeft / self.startTime)
+
+	if( self.timeLeft <= 0 ) then
+		self:SetScript("OnUpdate", nil)
+
+		self.ready.status = nil
+		self.ready:Hide()
+	end
+end
+
 local FADEOUT_TIME = 6
 function Indicators:UpdateReadyCheck(frame, event)
 	if( not frame.indicators.ready or not frame.indicators.ready.enabled ) then return end
@@ -279,7 +292,7 @@ function Indicators:UpdateReadyCheck(frame, event)
 
 		-- Player never responded so they are AFK
 		if( frame.indicators.ready.status == "waiting" ) then
-			frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+			frame.indicators.ready:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady")
 		end
 		return
 	end
@@ -293,12 +306,12 @@ function Indicators:UpdateReadyCheck(frame, event)
 	end
 
 	if( status == "ready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture(READY_CHECK_READY_TEXTURE)
 	elseif( status == "notready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		frame.indicators.ready:SetTexture(READY_CHECK_NOT_READY_TEXTURE)
 	elseif( status == "waiting" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_WAITING_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
-	end
+		frame.indicators.ready:SetTexture(READY_CHECK_WAITING_TEXTURE)
+		end
 
 	frame.indicators:SetScript("OnUpdate", nil)
 	frame.indicators.ready.status = status
@@ -363,13 +376,13 @@ function Indicators:OnEnable(frame)
 	    frame.indicators.resurrect:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
 	end
 
-	if( config.indicators.sumPending and config.indicators.sumPending.enabled ) then
-		frame:RegisterNormalEvent("INCOMING_SUMMON_CHANGED", self, "SummonPending")
-		frame:RegisterUpdateFunc(self, "SummonPending")
+	-- if( config.indicators.sumPending and config.indicators.sumPending.enabled ) then
+		-- frame:RegisterNormalEvent("INCOMING_SUMMON_CHANGED", self, "SummonPending")
+		-- frame:RegisterUpdateFunc(self, "SummonPending")
 
-		frame.indicators.sumPending = frame.indicators.sumPending or frame.indicators:CreateTexture(nil, "OVERLAY")
-		frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
-	end
+		-- frame.indicators.sumPending = frame.indicators.sumPending or frame.indicators:CreateTexture(nil, "OVERLAY")
+		-- frame.indicators.sumPending:SetTexture("Interface\\RaidFrame\\RaidFrameSummon")
+	-- end
 
 	if( config.indicators.pvp and config.indicators.pvp.enabled ) then
 		frame:RegisterUnitEvent("UNIT_FACTION", self, "UpdatePVPFlag")
@@ -430,13 +443,13 @@ function Indicators:OnEnable(frame)
 		frame.indicators.lfdRole:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
 	end
 
-	if( config.indicators.questBoss and config.indicators.questBoss.enabled ) then
-		frame:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", self, "UpdateQuestBoss")
-		frame:RegisterUpdateFunc(self, "UpdateQuestBoss")
+	-- if( config.indicators.questBoss and config.indicators.questBoss.enabled ) then
+		-- frame:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", self, "UpdateQuestBoss")
+		-- frame:RegisterUpdateFunc(self, "UpdateQuestBoss")
 
-		frame.indicators.questBoss = frame.indicators.questBoss or frame.indicators:CreateTexture(nil, "OVERLAY")
-		frame.indicators.questBoss:SetTexture("Interface\\TargetingFrame\\PortraitQuestBadge")
-	end
+		-- frame.indicators.questBoss = frame.indicators.questBoss or frame.indicators:CreateTexture(nil, "OVERLAY")
+		-- frame.indicators.questBoss:SetTexture("Interface\\TargetingFrame\\PortraitQuestBadge")
+	-- end
 
 	if( config.indicators.petBattle and config.indicators.petBattle.enabled ) then
 		frame:RegisterUpdateFunc(self, "UpdatePetBattle")

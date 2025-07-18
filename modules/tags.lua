@@ -1,4 +1,6 @@
 local GetSpellName = C_Spell.GetSpellName
+local GetSpecialization = C_SpecializationInfo.GetSpecialization or _G.GetSpecialization
+
 
 local Tags = {afkStatus = {}, offlineStatus = {}, customEvents = {}, powerMap = {}, moduleKey = "tags"}
 local tagPool, functionPool, temp, regFontStrings, powerMap = {}, {}, {}, {}, Tags.powerMap
@@ -814,9 +816,43 @@ Tags.defaultTags = {
 		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.HolyPower)
 		return points and points > 0 and points
 	end]],
+	["priest:shadoworbs"] = [[function(unit, unitOwner)
+		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.ShadowOrbs)
+		return points and points > 0 and points
+	end]],
 	["monk:chipoints"] = [[function(unit, unitOwner)
 		local points = UnitPower(ShadowUF.playerUnit, Enum.PowerType.Chi)
 		return points and points > 0 and points
+	end]],
+	["warlock:demonic:perpp"] = [[function(unit, unitOwner)
+		local maxPower = UnitPowerMax(unit, Enum.PowerType.DemonicFury)
+		if( maxPower <= 0 ) then
+			return nil
+		elseif( UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) ) then
+			return "0%"
+		end
+		
+		return string.format("%d%%", math.floor(UnitPower(unit, Enum.PowerType.DemonicFury) / maxPower * 100 + 0.5))
+	end]],
+	["warlock:demonic:maxpp"] = [[function(unit, unitOwner)
+		local power = UnitPowerMax(unit, Enum.PowerType.DemonicFury)
+		if( power <= 0 ) then
+			return nil
+		elseif( UnitIsDeadOrGhost(unit) ) then
+			return 0
+		end
+		
+		return ShadowUF:FormatLargeNumber(power)
+	end]],
+	["warlock:demonic:curpp"] = [[function(unit, unitOwner)
+		local power = UnitPower(unit, Enum.PowerType.DemonicFury)
+		if( power <= 0 ) then
+			return nil
+		elseif( UnitIsDeadOrGhost(unit) ) then
+			return 0
+		end
+		
+		return ShadowUF:FormatLargeNumber(power)
 	end]],
 	["cpoints"] = [[function(unit, unitOwner)
 		if( UnitHasVehicleUI("player") and UnitHasVehiclePlayerFrameUI("player") ) then
@@ -891,19 +927,19 @@ Tags.defaultTags = {
 	["druid:curpp"] = [[function(unit, unitOwner)
 		if( select(2, UnitClass(unit)) ~= "DRUID" ) then return nil end
 		local powerType = UnitPowerType(unit)
-		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		return ShadowUF:FormatLargeNumber(UnitPower(unit, Enum.PowerType.Mana))
 	end]],
 	["druid:abscurpp"] = [[function(unit, unitOwner)
 		if( select(2, UnitClass(unit)) ~= "DRUID" ) then return nil end
 		local powerType = UnitPowerType(unit)
-		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		return UnitPower(unit, Enum.PowerType.Mana)
 	end]],
 	["druid:curmaxpp"] = [[function(unit, unitOwner)
 		if( select(2, UnitClass(unit)) ~= "DRUID" ) then return nil end
 		local powerType = UnitPowerType(unit)
-		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 
 		local maxPower = UnitPowerMax(unit, Enum.PowerType.Mana)
 		local power = UnitPower(unit, Enum.PowerType.Mana)
@@ -915,10 +951,15 @@ Tags.defaultTags = {
 
 		return string.format("%s/%s", ShadowUF:FormatLargeNumber(power), ShadowUF:FormatLargeNumber(maxPower))
 	end]],
+	["druid:eclipse"] = [[function(unit, unitOwner)
+		if( C_SpecializationInfo.GetSpecialization() ~= 1 ) then return nil end
+
+		return UnitPower(unitOwner, Enum.PowerType.Balance)
+	end]],
 	["druid:absolutepp"] = [[function(unit, unitOwner)
 		if( select(2, UnitClass(unit)) ~= "DRUID" ) then return nil end
 		local powerType = UnitPowerType(unit)
-		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+		if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 
 		return UnitPower(unit, Enum.PowerType.Mana)
 	end]],
@@ -926,7 +967,7 @@ Tags.defaultTags = {
 		local class = select(2, UnitClass(unit))
 		local powerType = UnitPowerType(unit)
 		if( class == "DRUID" ) then
-			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		elseif( class == "PRIEST" ) then
 			if( powerType ~= Enum.PowerType.Insanity ) then return nil end
 		elseif( class == "SHAMAN" ) then
@@ -940,7 +981,7 @@ Tags.defaultTags = {
 		local class = select(2, UnitClass(unit))
 		local powerType = UnitPowerType(unit)
 		if( class == "DRUID" ) then
-			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		elseif( class == "PRIEST" ) then
 			if( powerType ~= Enum.PowerType.Insanity ) then return nil end
 		elseif( class == "SHAMAN" ) then
@@ -954,7 +995,7 @@ Tags.defaultTags = {
 		local class = select(2, UnitClass(unit))
 		local powerType = UnitPowerType(unit)
 		if( class == "DRUID" ) then
-			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		elseif( class == "PRIEST" ) then
 			if( powerType ~= Enum.PowerType.Insanity ) then return nil end
 		elseif( class == "SHAMAN" ) then
@@ -977,7 +1018,7 @@ Tags.defaultTags = {
 		local class = select(2, UnitClass(unit))
 		local powerType = UnitPowerType(unit)
 		if( class == "DRUID" ) then
-			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.LunarPower ) then return nil end
+			if( powerType ~= Enum.PowerType.Rage and powerType ~= Enum.PowerType.Energy and powerType ~= Enum.PowerType.Balance ) then return nil end
 		elseif( class == "PRIEST" ) then
 			if( powerType ~= Enum.PowerType.Insanity ) then return nil end
 		elseif( class == "SHAMAN" ) then
@@ -1097,6 +1138,7 @@ Tags.defaultEvents = {
 	["curmaxpp"]				= "SUF_POWERTYPE:CURRENT UNIT_POWER_FREQUENT UNIT_MAXPOWER",
 	["absolutepp"]				= "SUF_POWERTYPE:CURRENT UNIT_POWER_FREQUENT UNIT_MAXPOWER",
 	["smart:curmaxpp"]			= "SUF_POWERTYPE:CURRENT UNIT_POWER_FREQUENT UNIT_MAXPOWER",
+	["druid:eclipse"]			= "UNIT_POWER_FREQUENT UNIT_MAXPOWER",
 	["druid:curpp"]  	    	= "SUF_POWERTYPE:MANA UNIT_POWER_FREQUENT UNIT_DISPLAYPOWER",
 	["druid:abscurpp"]      	= "SUF_POWERTYPE:MANA UNIT_POWER_FREQUENT UNIT_DISPLAYPOWER",
 	["druid:curmaxpp"]			= "SUF_POWERTYPE:MANA UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER",
@@ -1140,7 +1182,11 @@ Tags.defaultEvents = {
 	["unit:scaled:threat"]		= "UNIT_THREAT_SITUATION_UPDATE",
 	["unit:color:sit"]			= "UNIT_THREAT_SITUATION_UPDATE",
 	["unit:situation"]			= "UNIT_THREAT_SITUATION_UPDATE",
+	["warlock:demonic:curpp"]	= "UNIT_POWER_FREQUENT",
+	["warlock:demonic:maxpp"] 	= "UNIT_MAXPOWER",
+	["warlock:demonic:perpp"] 	= "UNIT_POWER_FREQUENT UNIT_MAXPOWER",
 	["monk:chipoints"]			= "SUF_POWERTYPE:LIGHT_FORCE UNIT_POWER_FREQUENT",
+	["priest:shadoworbs"]		= "SUF_POWERTYPE:SHADOW_ORBS UNIT_POWER_FREQUENT",
 }
 
 -- Default update frequencies for tag updating, used if it's needed to override the update speed
@@ -1225,6 +1271,7 @@ Tags.defaultCategories = {
 	["druid:abscurpp"]  	    = "classspec",
 	["druid:curmaxpp"]			= "classspec",
 	["druid:absolutepp"]		= "classspec",
+	["druid:eclipse"]			= "classspec",
 	["sec:curpp"]     	    	= "classspec",
 	["sec:abscurpp"]  	    	= "classspec",
 	["sec:curmaxpp"]			= "classspec",
@@ -1243,9 +1290,14 @@ Tags.defaultCategories = {
 	["unit:color:aggro"]		= "threat",
 	["unit:raid:assist"]		= "raid",
 	["unit:raid:targeting"] 	= "raid",
+	["warlock:demonic:curpp"]	= "classspec",
+	["warlock:demonic:maxpp"] 	= "classspec",
+	["warlock:demonic:perpp"] 	= "classspec",
 	["monk:chipoints"]			= "classspec",
 	["monk:stagger"]			= "classspec",
-	["monk:abs:stagger"]		= "classspec"
+	["monk:abs:stagger"]		= "classspec",
+	["priest:shadoworbs"]		= "classspec",
+
 }
 
 -- Default tag help
@@ -1315,6 +1367,7 @@ Tags.defaultHelp = {
 	["abbrev:name"]				= L["Abbreviates unit names above 10 characters, \"Dark Rune Champion\" becomes \"D.R.Champion\" and \"Dark Rune Commoner\" becomes \"D.R.Commoner\"."],
 	["group"]					= L["Shows current group number of the unit."],
 	["close"]					= L["Closes a color code, prevents colors from showing up on text that you do not want it to."],
+	["druid:eclipse"]			= L["Current Eclipse, <0 is Lunar Energy and >0 is Solar Energy."],
 	["druid:curpp"]         	= string.format(L["Works the same as [%s], but this is only shown if the unit is in Cat or Bear form."], "currpp"),
 	["druid:abscurpp"]      	= string.format(L["Works the same as [%s], but this is only shown if the unit is in Cat or Bear form."], "abscurpp"),
 	["druid:curmaxpp"]			= string.format(L["Works the same as [%s], but this is only shown if the unit is in Cat or Bear form."], "curmaxpp"),
@@ -1335,9 +1388,14 @@ Tags.defaultHelp = {
 	["color:aggro"]				= L["Same as [color:sit] except it only returns red if you have aggro, rather than transiting from yellow -> orange -> red."],
 	["unit:raid:targeting"]		= L["How many people in your raid are targeting the unit, for example if you put this on yourself it will show how many people are targeting you. This includes you in the count!"],
 	["unit:raid:assist"]		= L["How many people are assisting the unit, for example if you put this on yourself it will show how many people are targeting your target. This includes you in the count!"],
+	["warlock:demonic:curpp"]	= string.format(L["Works the same as [%s], but this is usedd to show Demonic Fury power for Demonology Warlocks."], "curpp"),
+	["warlock:demonic:maxpp"] 	= string.format(L["Works the same as [%s], but this is usedd to show Demonic Fury power for Demonology Warlocks."], "maxpp"),
+	["warlock:demonic:perpp"] 	= string.format(L["Works the same as [%s], but this is usedd to show Demonic Fury power for Demonology Warlocks."], "perpp"),
 	["monk:chipoints"]			= L["How many Chi points you currently have."],
 	["monk:stagger"]			= L["Shows the current staggered damage, if 12,000 damage is staggered, shows 12k."],
-	["monk:abs:stagger"]		= L["Shows the absolute staggered damage, if 16,000 damage is staggered, shows 16,000."]
+	["monk:abs:stagger"]		= L["Shows the absolute staggered damage, if 16,000 damage is staggered, shows 16,000."],
+	["priest:shadoworbs"]		= L["How many Shadow Orbs you have if you're Shadow"],
+
 }
 
 Tags.defaultNames = {
@@ -1409,6 +1467,7 @@ Tags.defaultNames = {
 	["dechp"]					= L["Decimal percent HP"],
 	["group"]					= L["Group number"],
 	["close"]					= L["Close color"],
+	["druid:eclipse"]			= L["Eclipse (Druid)"],
 	["druid:curpp"]         	= L["Current power (Druid)"],
 	["druid:abscurpp"]      	= L["Current power (Druid/Absolute)"],
 	["druid:curmaxpp"]			= L["Cur/Max power (Druid)"],
@@ -1426,9 +1485,14 @@ Tags.defaultNames = {
 	["unit:color:aggro"]		= L["Unit color code on aggro"],
 	["unit:raid:targeting"]		= L["Raid targeting unit"],
 	["unit:raid:assist"]		= L["Raid assisting unit"],
+	["warlock:demonic:curpp"]	= L["Current Demonic Fury (Short)"],
+	["warlock:demonic:maxpp"] 	= L["Max Demonic Fury (Short)"],
+	["warlock:demonic:perpp"] 	= L["Percent Demonic Fury"],										
 	["monk:chipoints"]			= L["Chi Points"],
 	["monk:stagger"]			= L["Stagger (Monk)"],
-	["monk:abs:stagger"]		= L["Stagger (Monk/Absolute)"]
+	["monk:abs:stagger"]		= L["Stagger (Monk/Absolute)"],
+	["priest:shadoworbs"]		= L["Shadow Orbs"],
+
 }
 
 -- List of event types
@@ -1573,7 +1637,7 @@ end
 
 
 -- Checker function, makes sure tags are all happy
---@debug@
+--[==[@debug@
 function Tags:Verify()
 	local fine = true
 	for tag, events in pairs(self.defaultEvents) do
@@ -1618,4 +1682,4 @@ function Tags:Verify()
 		print("Verified tags, everything is fine.")
 	end
 end
---@end-debug@
+--@end-debug@]==]
