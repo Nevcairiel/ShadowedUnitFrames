@@ -42,6 +42,7 @@ read_globals = {
 	"RealMobHealth",
 
 	-- API functions
+	"C_PartyInfo",
 	"C_Timer",
 	"CancelUnitBuff",
 	"CanHearthAndResurrectFromArea",
