@@ -1235,6 +1235,14 @@ local function loadGeneralOptions()
 								arg = "powerColors.ARCANECHARGES",
 								hidden = function(info) return select(2, UnitClass("player")) ~= "MAGE" end,
 							},
+							ESSENCE = {
+								order = 16,
+								type = "color",
+								name = L["Essence"],
+								hasAlpha = true,
+								arg = "powerColors.ESSENCE",
+								hidden = function(info) return select(2, UnitClass("player")) ~= "EVOKER" end,
+							},
 							CHI = {
 								order = 17,
 								type = "color",
