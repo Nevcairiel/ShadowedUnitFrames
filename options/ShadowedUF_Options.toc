@@ -1,10 +1,10 @@
-## Interface: 110107, 110200
+## Interface: 110200, 110205
 ## Title: Shadowed UF (Options)
 ## Notes: Configuration for Shadowed Unit Frames.
 ## Author: Shadowed
 ## LoadOnDemand: true
 ## Dependencies: ShadowedUnitFrames
-## Category: ShadowedUnitFrames
+## Group: ShadowedUnitFrames
 
 #@no-lib-strip@
 libs\AceDBOptions-3.0\AceDBOptions-3.0.xml

@@ -1,4 +1,4 @@
-## Interface: 110107, 110200
+## Interface: 110200, 110205
 ## Title: Shadowed Unit Frames
 ## Notes: Moooooooooooooooooo
 ## Author: Shadowed
@@ -8,7 +8,18 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDualSpec-1.0, LibSpellRange-1.0, UTF8, Clique
 ## X-Curse-Project-ID: 19268
 ## X-WoWI-ID: 13494
-## Category: ShadowedUnitFrames
+## Category: Unit Frames
+## Category-deDE: Einheitenfenster
+## Category-esES: Marcos de unidades
+## Category-esMX: Marcos de unidades
+## Category-frFR: Portraits d'unités
+## Category-itIT: Riquadri delle unità
+## Category-koKR: 개체창
+## Category-ptBR: Quadros de unidade
+## Category-ruRU: Рамки юнитов
+## Category-zhCN: 单位框体
+## Category-zhTW: 單位框架
+## Group: ShadowedUnitFrames
 
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
