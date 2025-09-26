@@ -1674,12 +1674,20 @@ local function loadUnitOptions()
 		return info[2] ~= "raid" and info[2] ~= "raidpet" and info[2] ~= "maintank" and info[2] ~= "mainassist"
 	end
 
+	local function hideRaidOrPartyOption(info)
+		return hideRaidOption(info) and info[2] ~= "party"
+	end
+
 	local function hideSplitOrRaidOption(info)
 		if( info[2] == "raid" and ShadowUF.db.profile.units.raid.frameSplit ) then
 			return true
 		end
 
 		return hideRaidOption(info)
+	end
+
+	local function hideSplitOrRaidOrPartyOption(info)
+		return hideSplitOrRaidOption(info) and info[2] ~= "party"
 	end
 
 	-- Not every option should be changed via global settings
@@ -3909,12 +3917,12 @@ local function loadUnitOptions()
 							},
 						},
 					},
-					raid = {
+					groups = {
 						order = 3,
 						type = "group",
 						inline = true,
 						name = L["Groups"],
-						hidden = hideRaidOption,
+						hidden = hideRaidOrPartyOption,
 						args = {
 							groupBy = {
 								order = 4,
@@ -3922,7 +3930,7 @@ local function loadUnitOptions()
 								name = L["Group by"],
 								values = {["GROUP"] = L["Group number"], ["CLASS"] = L["Class"], ["ASSIGNEDROLE"] = L["Assigned Role (DPS/Tank/etc)"]},
 								arg = "groupBy",
-								hidden = hideSplitOrRaidOption,
+								hidden = hideSplitOrRaidOrPartyOption,
 							},
 							selectedGroups = {
 								order = 7,
