@@ -1,4 +1,4 @@
-local Indicators = {list = {"status", "pvp", "leader", "resurrect", "masterLoot", "raidTarget", "ready", "role", "class", "phase", "happiness" }}
+local Indicators = {list = {"status", "pvp", "leader", "resurrect", "sumPending", "masterLoot", "raidTarget", "ready", "role", "lfdRole", "class", "phase", "questBoss", "petBattle", "arenaSpec"}}
 
 ShadowUF:RegisterModule(Indicators, "indicators", ShadowUF.L["Indicators"])
 
@@ -79,7 +79,7 @@ end
 function Indicators:UpdateMasterLoot(frame)
 	if( not frame.indicators.masterLoot or not frame.indicators.masterLoot.enabled ) then return end
 
-	local lootType, partyID, raidID = GetLootMethod()
+	local lootType, partyID, raidID = C_PartyInfo.GetLootMethod()
 	if( lootType ~= "master" ) then
 		frame.indicators.masterLoot:Hide()
 	elseif( ( partyID and partyID == 0 and UnitIsUnit(frame.unit, "player") ) or ( partyID and partyID > 0 and UnitIsUnit(frame.unit, ShadowUF.partyUnits[partyID]) ) or ( raidID and raidID > 0 and UnitIsUnit(frame.unit, ShadowUF.raidUnits[raidID]) ) ) then
