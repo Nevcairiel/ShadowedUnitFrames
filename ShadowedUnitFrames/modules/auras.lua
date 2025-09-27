@@ -2,6 +2,8 @@ local Auras = {}
 local playerUnits = {player = true, vehicle = true, pet = true}
 local mainHand, offHand, tempEnchantScan = {time = 0}, {time = 0}
 local canCure = ShadowUF.Units.canCure
+local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+
 ShadowUF:RegisterModule(Auras, "auras", ShadowUF.L["Auras"])
 
 function Auras:OnEnable(frame)
@@ -594,7 +596,49 @@ local function scan(parent, frame, type, config, displayConfig, filter)
 	local index = 0
 	while( true ) do
 		index = index + 1
-		local name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff = AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(frame.parent.unit, index, filter))
+		
+
+local UnitAuraFunc
+if not ShadowUF.db.profile.locked then
+    -- Config (unlocked) mode: functions run with configEnv as their _ENV, so plain UnitAura refers to configEnv.UnitAura (the dummy movers.lua provides).
+    if _G.type(UnitAura) == "function" then
+        UnitAuraFunc = UnitAura
+    else
+        -- Safety: fallback no-op to avoid nil calls
+        UnitAuraFunc = function() return end
+    end
+else
+    -- Locked/normal gameplay: use the real Blizzard API (global _G.UnitAura) or the modern C_UnitAuras interface
+    if _G.type(_G.UnitAura) == "function" then
+        UnitAuraFunc = _G.UnitAura
+    elseif _G.C_UnitAuras and _G.type(_G.C_UnitAuras.GetAuraDataByIndex) == "function" then
+        UnitAuraFunc = function(unit, index, filter)
+            local info = _G.C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
+            if not info then return end
+            local name = info.spellName or info.name or info.displayName
+            local texture = info.icon or info.texture
+            local count = info.count or info.stackCount or 0
+            local auraType = info.debuffType or info.dispelType or info.auraType
+            local duration = info.durationSec or info.duration or 0
+            local endTime = info.expirationTime or (duration > 0 and (_G.GetTime() + duration)) or 0
+            local caster = info.sourceUnit or info.caster
+            local isRemovable = info.isStealable or info.isRemovable or false
+            local nameplateShowPersonal = info.nameplateShowPersonal or false
+            local spellID = info.spellId or info.spellID or 0
+            local canApplyAura = info.canApplyAura or info.canApply or false
+            local isBossDebuff = info.isBossAura or info.isBossDebuff or false
+            return name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff
+        end
+    else
+        UnitAuraFunc = function() return end
+    end
+end
+
+-- Call resolved function
+local name, texture, count, auraType, duration, endTime, caster, isRemovable,
+      nameplateShowPersonal, spellID, canApplyAura, isBossDebuff =
+      UnitAuraFunc(frame.parent.unit, index, filter)
+
 		if( not name ) then break end
 
 		renderAura(parent, frame, type, config, displayConfig, index, filter, isFriendly, curable, name, texture, count, auraType, duration, endTime, caster, isRemovable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff)
