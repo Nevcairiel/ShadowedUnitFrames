@@ -91,29 +91,35 @@ function Embers:UpdateBarBlocks(frame, event, unit, powerType)
 end
 
 function Embers:Update(frame, event, unit, powerType)
-	if( event and powerType ~= "BURNING_EMBERS" ) then return end
+    if( event and powerType ~= "BURNING_EMBERS" ) then return end
 
-	local power = UnitPower("player", Enum.PowerType.BurningEmbers, true)
-	for id=1, frame.burningEmbersBar.visibleBlocks do
-		local ember = frame.burningEmbersBar.embers[id]
-		
-		local color
-		if( power >= MAX_POWER_PER_EMBER ) then
-			color = "FULLBURNINGEMBER"
-			ember:SetValue(MAX_POWER_PER_EMBER)
-		elseif( power > 0 ) then
-			color = "BURNINGEMBERS"
-			ember:SetValue(power)
-		else
-			color = "BURNINGEMBERS"
-			ember:SetValue(0)
-		end
+    local power = UnitPower("player", Enum.PowerType.BurningEmbers, true)
+    for id=1, frame.burningEmbersBar.visibleBlocks do
+        local ember = frame.burningEmbersBar.embers[id]
 
-		if( ember.setColor ~= color ) then
-			ember.setColor = color
-			frame:SetBlockColor(ember, "burningEmbersBar", ShadowUF.db.profile.powerColors[color].r, ShadowUF.db.profile.powerColors[color].g, ShadowUF.db.profile.powerColors[color].b)
-		end
+        local value = math.min(power, MAX_POWER_PER_EMBER)
+        ember:SetValue(value)
 
-		power = power - MAX_POWER_PER_EMBER
-	end
+        local color
+        if value == MAX_POWER_PER_EMBER then
+            color = "FULLBURNINGEMBER"
+        else
+            color = "BURNINGEMBERS"
+        end
+
+        if ember.setColor ~= color then
+            ember.setColor = color
+            frame:SetBlockColor(
+                ember,
+                "burningEmbersBar",
+                ShadowUF.db.profile.powerColors[color].r,
+                ShadowUF.db.profile.powerColors[color].g,
+                ShadowUF.db.profile.powerColors[color].b
+            )
+        end
+
+        power = power - MAX_POWER_PER_EMBER
+    end
 end
+
+
