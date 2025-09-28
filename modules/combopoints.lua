@@ -2,7 +2,7 @@ if( not ShadowUF.ComboPoints ) then return end
 
 local Combo = setmetatable({}, {__index = ShadowUF.ComboPoints})
 ShadowUF:RegisterModule(Combo, "comboPoints", ShadowUF.L["Combo points"])
-local cpConfig = {max = MAX_COMBO_POINTS, key = "comboPoints", colorKey = "COMBOPOINTS", powerType = 4, eventType = "COMBO_POINTS", icon = "Interface\\AddOns\\ShadowedUnitFrames\\media\\textures\\combo"}
+local cpConfig = {max = MAX_COMBO_POINTS, key = "comboPoints", colorKey = "COMBOPOINTS", powerType = Enum.PowerType.ComboPoints, eventType = "COMBO_POINTS", icon = "Interface\\AddOns\\ShadowedUnitFrames\\media\\textures\\combo"}
 
 function Combo:OnEnable(frame)
 	frame.comboPoints = frame.comboPoints or CreateFrame("Frame", nil, frame)
@@ -35,8 +35,14 @@ function Combo:GetPoints(unit)
 	end
 end
 
+local ParentUpdate = ShadowUF.ComboPoints.Update
+
 function Combo:Update(frame, event, unit, powerType)
+	-- Prevent recursion when arena frames are unloading
+	if not frame or not frame.comboPoints or not frame.comboPoints.cpConfig then
+		return
+	end
 	if( not event or ( unit == frame.unit or unit == frame.vehicleUnit or unit == "player" or unit == "vehicle" ) ) then
-		ShadowUF.ComboPoints.Update(self, frame, event, unit, powerType)
+		ParentUpdate(self, frame, event, unit, powerType)
 	end
 end
