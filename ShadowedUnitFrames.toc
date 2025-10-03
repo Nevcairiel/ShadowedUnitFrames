@@ -1,5 +1,5 @@
-## Interface: 40400
-## Interface-Classic: 11502
+## Interface: 50500, 50501
+## Interface-Vanilla: 11507
 ## Title: Shadowed Unit Frames
 ## Notes: Moooooooooooooooooo
 ## Author: Shadowed
