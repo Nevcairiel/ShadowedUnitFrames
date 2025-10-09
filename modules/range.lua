@@ -53,7 +53,7 @@ local rangeSpells = {}
 local UnitPhaseReason_o = UnitPhaseReason
 local UnitPhaseReason = function(unit)
 	local phase = UnitPhaseReason_o(unit)
-	if (phase == Enum.PhaseReason.WarMode or phase == Enum.PhaseReason.ChromieTime) and UnitIsVisible(unit) then
+	if (phase == Enum.PhaseReason.WarMode or phase == Enum.PhaseReason.ChromieTime or Enum.PhaseReason.TimerunningHwt) and UnitIsVisible(unit) then
 		return nil
 	end
 	return phase
