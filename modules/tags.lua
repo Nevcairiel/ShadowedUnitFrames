@@ -370,7 +370,24 @@ end
 
 -- Name abbreviation
 local function abbreviateName(text)
-	return (string.utf8sub or string.sub)(text, 1, 1) .. "."
+	if not text or text == "" then
+		return "."
+	end
+
+	if utf8sub then
+		-- Use Blizzard's UTF-8 safe substring helper when available
+		local first = utf8sub(text, 1, 1)
+		if first and first ~= "" then
+			return first .. "."
+		end
+	end
+
+	local first = string.match(text, "[%z\1-\127\194-\244][\128-\191]*")
+	if not first or first == "" then
+		first = string.sub(text, 1, 1)
+	end
+
+	return first .. "."
 end
 
 Tags.abbrevCache = setmetatable({}, {
