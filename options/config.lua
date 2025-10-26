@@ -4741,6 +4741,98 @@ local function loadUnitOptions()
 		Config.unitTable.args.indicators.args[indicator] = Config.indicatorTable
 	end
 
+	Config.unitTable.args.indicators.args.lfdRole = {
+		order = 0,
+		name = function(info)
+			if( info[#(info)] == "status" and info[2] == "player" ) then
+				return L["Combat/resting status"]
+			end
+
+			return getName(info)
+		end,
+		desc = function(info) return INDICATOR_DESC[info[#(info)]] end,
+		type = "group",
+		hidden = hideRestrictedOption,
+		args = {
+			enabled = {
+				order = 0,
+				type = "toggle",
+				name = L["Enable indicator"],
+				hidden = false,
+				arg = "indicators.$parent.enabled",
+			},
+			sep1 = {
+				order = 1,
+				type = "description",
+				name = "",
+				width = "full",
+				hidden = function() return not ShadowUF.db.profile.advanced end,
+			},
+			anchorPoint = {
+				order = 2,
+				type = "select",
+				name = L["Anchor point"],
+				values = positionList,
+				hidden = false,
+				arg = "indicators.$parent.anchorPoint",
+			},
+			size = {
+				order = 4,
+				type = "range",
+				name = L["Size"],
+				min = 1, max = 40, step = 1,
+				hidden = hideAdvancedOption,
+				arg = "indicators.$parent.size",
+			},
+			x = {
+				order = 5,
+				type = "range",
+				name = L["X Offset"],
+				min = -100, max = 100, step = 1, softMin = -50, softMax = 50,
+				hidden = false,
+				arg = "indicators.$parent.x",
+			},
+			y = {
+				order = 6,
+				type = "range",
+				name = L["Y Offset"],
+				min = -100, max = 100, step = 1, softMin = -50, softMax = 50,
+				hidden = false,
+				arg = "indicators.$parent.y",
+			},
+			roles = {
+				order = 7,
+				type = "group",
+				inline = true,
+				name = L["ROLE"],
+				hidden = function() return not ShadowUF.db.profile.advanced end,
+				args = {
+					tank = {
+						order = 1,
+						type = "toggle",
+						name = L["TANK"],
+						hidden = hideAdvancedOption,
+						arg = "indicators.$parentparent.tank",
+					},
+					healer = {
+						order = 2,
+						type = "toggle",
+						name = L["HEALER"],
+						hidden = hideAdvancedOption,
+						arg = "indicators.$parentparent.healer",
+					},
+					damage = {
+						order = 3,
+						type = "toggle",
+						name = L["DAMAGER"],
+						hidden = hideAdvancedOption,
+						arg = "indicators.$parentparent.damage",
+					},
+				},
+			},
+		},
+	}
+
 	-- Check for unit conflicts
 	local function hideZoneConflict()
 		for _, zone in pairs(ShadowUF.db.profile.visibility) do

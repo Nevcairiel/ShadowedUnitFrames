@@ -130,13 +130,14 @@ function Indicators:UpdateLFDRole(frame, event)
 		role = specID and select(6, GetSpecializationInfoByID(specID))
 	end
 
-	if( role == "TANK" ) then
+	local lfdRole = ShadowUF.db.profile.units[frame.unitType].indicators.lfdRole
+	if( role == "TANK" and lfdRole.tank) then
 		frame.indicators.lfdRole:SetTexCoord(0, 19/64, 22/64, 41/64)
 		frame.indicators.lfdRole:Show()
-	elseif( role == "HEALER" ) then
+	elseif( role == "HEALER" and lfdRole.healer) then
 		frame.indicators.lfdRole:SetTexCoord(20/64, 39/64, 1/64, 20/64)
 		frame.indicators.lfdRole:Show()
-	elseif( role == "DAMAGER" ) then
+	elseif( role == "DAMAGER" and lfdRole.damage) then
 		frame.indicators.lfdRole:SetTexCoord(20/64, 39/64, 22/64, 41/64)
 		frame.indicators.lfdRole:Show()
 	else
