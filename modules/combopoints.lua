@@ -10,6 +10,7 @@ function Combo:OnEnable(frame)
 
 	frame:RegisterNormalEvent("UNIT_POWER_UPDATE", self, "Update", "player")
 	frame:RegisterNormalEvent("UNIT_POWER_FREQUENT", self, "Update", "player")
+	frame:RegisterNormalEvent("PLAYER_TARGET_CHANGED", self, "Update", "player")
 	frame:RegisterNormalEvent("UNIT_MAXPOWER", self, "UpdateBarBlocks", "player")
 
 	frame:RegisterUpdateFunc(self, "Update")
@@ -29,12 +30,18 @@ function Combo:GetMaxPoints()
 	end
 end
 
-function Combo:GetPoints(unit)
-	return UnitPower("player", cpConfig.powerType)
+function Combo:GetPoints(unit, frame)
+	if frame.unit == "target" then
+		return GetComboPoints("player", "target")
+	else
+		return UnitPower("player", cpConfig.powerType)
+	end
 end
 
 function Combo:Update(frame, event, unit, powerType)
 	if( not event or ( unit == frame.unit or unit == "player" ) ) then
 		ShadowUF.ComboPoints.Update(self, frame, event, unit, powerType)
+	elseif(event == "PLAYER_TARGET_CHANGED" and frame.unit == "target") then
+		ShadowUF.ComboPoints.Update(self, frame, event, "player", cpConfig.powerType)
 	end
 end
