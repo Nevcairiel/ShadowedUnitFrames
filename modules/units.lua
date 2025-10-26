@@ -914,6 +914,17 @@ function Units:SetHeaderAttributes(frame, type)
 		frame:SetAttribute("columnSpacing", config.columnSpacing)
 		frame:SetAttribute("columnAnchorPoint", config.attribAnchorPoint)
 
+		if( config.groupBy == "CLASS" ) then
+			frame:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,PALADIN,PRIEST,ROGUE,SHAMAN,WARLOCK,WARRIOR,MONK")
+			frame:SetAttribute("groupBy", "CLASS")
+		elseif( config.groupBy == "ASSIGNEDROLE" ) then
+			frame:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
+			frame:SetAttribute("groupBy", "ASSIGNEDROLE")
+		else
+			frame:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+			frame:SetAttribute("groupBy", "GROUP")
+		end
+
 		self:CheckGroupVisibility()
 		if( stateMonitor.party ) then
 			stateMonitor.party:SetAttribute("hideSemiRaid", ShadowUF.db.profile.units.party.hideSemiRaid)
