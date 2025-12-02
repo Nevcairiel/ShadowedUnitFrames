@@ -54,7 +54,7 @@ local PAGE_DESC = {
 	["filter"] = L["Simple aura filtering by whitelists and blacklists."],
 }
 local INDICATOR_NAMES = {["questBoss"] = L["Quest Boss"], ["leader"] = L["Leader / Assist"], ["lfdRole"] = L["Class Role"], ["masterLoot"] = L["Master Looter"], ["pvp"] = L["PvP Flag"], ["raidTarget"] = L["Raid Target"], ["ready"] = L["Ready Status"], ["role"] = L["Raid Role"], ["status"] = L["Combat Status"], ["class"] = L["Class Icon"], ["resurrect"] = L["Resurrect Status"], ["sumPending"] = L["Summon Pending"], ["phase"] = L["Other Party/Phase Status"], ["petBattle"] = L["Pet Battle"], ["arenaSpec"] = L["Arena Spec"]}
-local AREA_NAMES = {["arena"] = L["Arenas"],["none"] = L["Everywhere else"], ["party"] = L["Party instances"], ["pvp"] = L["Battleground"], ["raid"] = L["Raid instances"]}
+local AREA_NAMES = {["arena"] = L["Arenas"],["none"] = L["Everywhere else"], ["party"] = L["Party instances"], ["pvp"] = L["Battleground"], ["raid"] = L["Raid instances"], ["neighborhood"] = L["Neighborhood"]}
 local INDICATOR_DESC = {
 		["leader"] = L["Crown indicator for group leader or assistants."], ["lfdRole"] = L["Role the unit is playing."],
 		["masterLoot"] = L["Bag indicator for master looters."], ["pvp"] = L["PVP flag indicator, Horde for Horde flagged pvpers and Alliance for Alliance flagged pvpers."],
@@ -6409,6 +6409,7 @@ local function loadVisibilityOptions()
 			arena = areaTable,
 			party = areaTable,
 			raid = areaTable,
+			neighborhood = areaTable,
 		},
 	}
 end
