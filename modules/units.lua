@@ -248,6 +248,7 @@ local function SetVisibility(self)
 	local instanceType = select(2, IsInInstance()) or "none"
 	local playerSpec = GetSpecialization()
 	if( instanceType == "scenario" ) then instanceType = "party" end
+	if( instanceType == "interior" ) then instanceType = "neighborhood" end
 
 	-- Selectively disable modules
 	for _, module in pairs(ShadowUF.moduleOrder) do
@@ -1460,6 +1461,7 @@ function Units:CheckPlayerZone(force)
 	-- CanHearthAndResurrectFromArea() returns true for world pvp areas, according to BattlefieldFrame.lua
 	local instance = CanHearthAndResurrectFromArea() and "pvp" or select(2, IsInInstance()) or "none"
 	if( instance == "scenario" ) then instance = "party" end
+	if( instance == "interior" ) then instance = "neighborhood" end
 
 	if( instance == instanceType and not force ) then return end
 	instanceType = instance

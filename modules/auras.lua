@@ -488,6 +488,7 @@ local filterDefault = {}
 function Auras:UpdateFilter(frame)
 	local zone = select(2, IsInInstance()) or "none"
 	if( zone == "scenario" ) then zone = "party" end
+	if( zone == "interior" ) then zone = "neighborhood" end
 
 	local id = zone .. frame.unitType
 
