@@ -25,7 +25,15 @@ local Range = {
 
 ShadowUF:RegisterModule(Range, "range", ShadowUF.L["Range indicator"])
 
-local LSR = LibStub("SpellRange-1.0")
+local LSR = LibStub("SpellRange-1.0", true)
+
+local function IsSpellInRangeCheck(spell, unit)
+	if LSR then
+		return LSR.IsSpellInRange(spell, unit)
+	else
+		return IsSpellInRange(spell, unit)
+	end
+end
 
 local playerClass = select(2, UnitClass("player"))
 local rangeSpells = {}
@@ -44,7 +52,7 @@ local function checkRange(self)
 	if( not UnitIsConnected(frame.unit) or not UnitInPhase(frame.unit) ) then
 		frame:SetRangeAlpha(ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	elseif( spell ) then
-		frame:SetRangeAlpha(LSR.IsSpellInRange(spell, frame.unit) == 1 and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
+		frame:SetRangeAlpha(IsSpellInRangeCheck(spell, frame.unit) == 1 and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
 	-- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
 	elseif( UnitInRaid(frame.unit) or UnitInParty(frame.unit) ) then
 		frame:SetRangeAlpha(UnitInRange(frame.unit, "player") and ShadowUF.db.profile.units[frame.unitType].range.inAlpha or ShadowUF.db.profile.units[frame.unitType].range.oorAlpha)
