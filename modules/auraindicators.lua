@@ -23,7 +23,7 @@ Indicators.auraConfig = setmetatable({}, {
 		return tbl[index]
 end})
 
-local playerUnits = {player = true, pet = true}
+local playerUnits = {player = true, vehicle = true, pet = true}
 local backdropTbl = {bgFile = "Interface\\Addons\\ShadowedUnitFrames\\mediabackdrop", edgeFile = "Interface\\Addons\\ShadowedUnitFrames\\media\\backdrop", tile = true, tileSize = 1, edgeSize = 1}
 
 function Indicators:OnEnable(frame)

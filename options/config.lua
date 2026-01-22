@@ -4,6 +4,8 @@ local playerClass = select(2, UnitClass("player"))
 local modifyUnits, globalConfig = {}, {}
 local L = ShadowUF.L
 
+local WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+
 ShadowUF.Config = Config
 
 --[[
@@ -2477,6 +2479,43 @@ local function loadUnitOptions()
 				set = setUnit,
 				get = getUnit,
 				args = {
+					vehicle = WoWWrath and {
+						order = 1,
+						type = "group",
+						inline = true,
+						name = L["Vehicles"],
+						hidden = function(info) return info[2] ~= "player" and info[2] ~= "party" or not ShadowUF.db.profile.advanced end,
+						args = {
+							disable = {
+								order = 0,
+								type = "toggle",
+								name = L["Disable vehicle swap"],
+								desc = L["Disables the unit frame from turning into a vehicle when the player enters one."],
+								set = function(info, value)
+									setUnit(info, value)
+									local unit = info[2]
+									if( unit == "player" ) then
+										if( ShadowUF.Units.unitFrames.pet ) then
+											ShadowUF.Units.unitFrames.pet:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units[unit].disableVehicle)
+										end
+
+										if( ShadowUF.Units.unitFrames.player ) then
+											ShadowUF.Units:CheckVehicleStatus(ShadowUF.Units.unitFrames.player)
+										end
+									elseif( unit == "party" ) then
+										for frame in pairs(ShadowUF.Units.unitFrames) do
+											if( frame.unitType == "partypet" ) then
+												frame:SetAttribute("disableVehicleSwap", ShadowUF.db.profile.units[unit].disableVehicle)
+											elseif( frame.unitType == "party" ) then
+												ShadowUF.Units:CheckVehicleStatus(frame)
+											end
+										end
+									end
+								end,
+								arg = "disableVehicle",
+							},
+						},
+					} or nil,
 					portrait = {
 						order = 2,
 						type = "group",
