@@ -404,6 +404,7 @@ function Layout:SetupFontString(fontString, extraSize)
 	if( size <= 0 ) then size = 1 end
 
 	fontString:SetFont(mediaPath.font, size, ShadowUF.db.profile.font.extra)
+	fontString:SetTextColor(ShadowUF.db.profile.font.color.r, ShadowUF.db.profile.font.color.g, ShadowUF.db.profile.font.color.b, ShadowUF.db.profile.font.color.a)
 
 	if( ShadowUF.db.profile.font.shadowColor and ShadowUF.db.profile.font.shadowX and ShadowUF.db.profile.font.shadowY ) then
 		fontString:SetShadowColor(ShadowUF.db.profile.font.shadowColor.r, ShadowUF.db.profile.font.shadowColor.g, ShadowUF.db.profile.font.shadowColor.b, ShadowUF.db.profile.font.shadowColor.a)
@@ -426,7 +427,6 @@ function Layout:InitFontString(parent, frame, id, config, blockID)
 	end
 
 	self:SetupFontString(fontString, config.size)
-	fontString:SetTextColor(ShadowUF.db.profile.font.color.r, ShadowUF.db.profile.font.color.g, ShadowUF.db.profile.font.color.b, ShadowUF.db.profile.font.color.a)
 	fontString:SetText(config.text)
 	fontString:SetJustifyH(self:GetJustify(config))
 	self:AnchorFrame(frame, fontString, config)
