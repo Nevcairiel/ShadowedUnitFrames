@@ -689,6 +689,7 @@ end
 local function hideBlizzardFrames(taint, ...)
 	for i=1, select("#", ...) do
 		local frame = select(i, ...)
+		if not frame then break end
 		UnregisterUnitWatch(frame)
 		frame:UnregisterAllEvents()
 		frame:Hide()
@@ -709,6 +710,7 @@ end
 
 local active_hiddens = {}
 function ShadowUF:HideBlizzardFrames()
+	if not self.db then return end
 	if( self.db.profile.hidden.cast and not active_hiddens.cast ) then
 		hideBlizzardFrames(true, PlayerCastingBarFrame, PetCastingBarFrame)
 	end
