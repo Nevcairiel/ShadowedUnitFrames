@@ -86,7 +86,22 @@ end
 
 function XP:UpdateRep(frame)
 	if( not frame.xpBar.rep ) then return end
-	local factionData = C_Reputation.GetWatchedFactionData()
+	local factionData
+	if C_Reputation and C_Reputation.GetWatchedFactionData then
+		factionData = C_Reputation.GetWatchedFactionData()
+	else
+		-- MoP 5.5.x fallback: use the old GetWatchedFactionInfo() API
+		local name, _, standingID, barMin, barMax, barValue = GetWatchedFactionInfo()
+		if name then
+			factionData = {
+				name = name,
+				reaction = standingID,
+				currentReactionThreshold = barMin,
+				nextReactionThreshold = barMax,
+				currentStanding = barValue,
+			}
+		end
+	end
 	if( not factionData ) then
 		frame.xpBar.rep:Hide()
 		return

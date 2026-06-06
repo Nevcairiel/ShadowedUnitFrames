@@ -712,7 +712,8 @@ local active_hiddens = {}
 function ShadowUF:HideBlizzardFrames()
 	if not self.db then return end
 	if( self.db.profile.hidden.cast and not active_hiddens.cast ) then
-		hideBlizzardFrames(true, PlayerCastingBarFrame, PetCastingBarFrame)
+		-- MoP 5.5.x uses CastingBarFrame; newer builds renamed it PlayerCastingBarFrame
+		hideBlizzardFrames(true, PlayerCastingBarFrame or CastingBarFrame, PetCastingBarFrame)
 	end
 
 	if( self.db.profile.hidden.party and not active_hiddens.party ) then
