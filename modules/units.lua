@@ -246,7 +246,7 @@ end
 local function SetVisibility(self)
 	local layoutUpdate
 	local instanceType = select(2, IsInInstance()) or "none"
-	local playerSpec = GetSpecialization()
+	local playerSpec = GetSpecialization and GetSpecialization() or 1
 	if( instanceType == "scenario" ) then instanceType = "party" end
 	if( instanceType == "interior" ) then instanceType = "neighborhood" end
 
