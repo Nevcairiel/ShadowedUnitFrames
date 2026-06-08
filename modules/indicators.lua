@@ -112,7 +112,7 @@ end
 function Indicators:UpdateQuestBoss(frame)
 	if( not frame.indicators.questBoss or not frame.indicators.questBoss.enabled ) then return end
 
-	if( UnitIsQuestBoss(frame.unit) ) then
+	if( UnitIsQuestBoss and UnitIsQuestBoss(frame.unit) ) then
 		frame.indicators.questBoss:Show()
 	else
 		frame.indicators.questBoss:Hide()
