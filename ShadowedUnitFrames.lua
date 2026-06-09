@@ -4,16 +4,18 @@
 
 ShadowUF = select(2, ...)
 
--- MoP 5.5.4 compat: DebuffTypeColor global was removed; define it with
--- the standard WoW debuff type colors so all modules work correctly.
+-- MoP 5.5.4 compat: DebuffTypeColor was replaced by individual globals
+-- (DEBUFF_TYPE_MAGIC_COLOR etc.). Rebuild the table from those if present,
+-- falling back to the classic WoW defaults so debuff border colours remain
+-- correct without hardcoding values that could differ per locale/patch.
 if not DebuffTypeColor then
 	DebuffTypeColor = {
-		["Magic"]   = {r = 0.20, g = 0.60, b = 1.00},
-		["Curse"]   = {r = 0.60, g = 0.00, b = 1.00},
-		["Disease"] = {r = 0.60, g = 0.40, b = 0.00},
-		["Poison"]  = {r = 0.00, g = 0.60, b = 0.00},
-		["none"]    = {r = 0.80, g = 0.00, b = 0.00},
-		[""]        = {r = 0.80, g = 0.00, b = 0.00},
+		["Magic"]   = DEBUFF_TYPE_MAGIC_COLOR   or {r = 0.20, g = 0.60, b = 1.00},
+		["Curse"]   = DEBUFF_TYPE_CURSE_COLOR   or {r = 0.60, g = 0.00, b = 1.00},
+		["Disease"] = DEBUFF_TYPE_DISEASE_COLOR or {r = 0.60, g = 0.40, b = 0.00},
+		["Poison"]  = DEBUFF_TYPE_POISON_COLOR  or {r = 0.00, g = 0.60, b = 0.00},
+		["none"]    = DEBUFF_TYPE_NONE_COLOR    or {r = 0.80, g = 0.00, b = 0.00},
+		[""]        = DEBUFF_TYPE_NONE_COLOR    or {r = 0.80, g = 0.00, b = 0.00},
 	}
 end
 
