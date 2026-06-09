@@ -4,6 +4,19 @@
 
 ShadowUF = select(2, ...)
 
+-- MoP 5.5.4 compat: DebuffTypeColor global was removed; define it with
+-- the standard WoW debuff type colors so all modules work correctly.
+if not DebuffTypeColor then
+	DebuffTypeColor = {
+		["Magic"]   = {r = 0.20, g = 0.60, b = 1.00},
+		["Curse"]   = {r = 0.60, g = 0.00, b = 1.00},
+		["Disease"] = {r = 0.60, g = 0.40, b = 0.00},
+		["Poison"]  = {r = 0.00, g = 0.60, b = 0.00},
+		["none"]    = {r = 0.80, g = 0.00, b = 0.00},
+		[""]        = {r = 0.80, g = 0.00, b = 0.00},
+	}
+end
+
 local L = ShadowUF.L
 ShadowUF.dbRevision = 63
 ShadowUF.playerUnit = "player"

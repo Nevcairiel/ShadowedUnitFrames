@@ -90,7 +90,7 @@ function Health:UpdateColor(frame)
 		frame:SetBarColor("healthBar", ShadowUF.db.profile.healthColors.offline.r, ShadowUF.db.profile.healthColors.offline.g, ShadowUF.db.profile.healthColors.offline.b)
 		return
 	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorDispel and frame.healthBar.hasDebuff ) then
-		color = DebuffTypeColor and DebuffTypeColor[frame.healthBar.hasDebuff]
+		color = DebuffTypeColor[frame.healthBar.hasDebuff]
 	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorAggro and UnitThreatSituation(frame.unit) == 3 ) then
 		frame:SetBarColor("healthBar", ShadowUF.db.profile.healthColors.aggro.r, ShadowUF.db.profile.healthColors.aggro.g, ShadowUF.db.profile.healthColors.aggro.b)
 		return

@@ -134,7 +134,7 @@ end
 function Highlight:Update(frame)
 	local color
 	if( frame.highlight.hasDebuff ) then
-		color = DebuffTypeColor and (DebuffTypeColor[frame.highlight.hasDebuff] or DebuffTypeColor[""]) or {r=0.8, g=0, b=0}
+		color = DebuffTypeColor[frame.highlight.hasDebuff] or DebuffTypeColor[""]
 	elseif( frame.highlight.hasThreat ) then
 		color = ShadowUF.db.profile.healthColors.hostile
 	elseif( frame.highlight.hasAttention ) then
