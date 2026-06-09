@@ -1,5 +1,8 @@
 if( not ShadowUF.ComboPoints ) then return end
 
+-- MoP 5.5.4 compat: GetSpec() may not exist in this build
+local function GetSpec() return GetSpecialization and GetSpecialization() or 1 end
+
 local Souls = setmetatable({}, {__index = ShadowUF.ComboPoints})
 ShadowUF:RegisterModule(Souls, "soulShards", ShadowUF.L["Soul Shards"], nil, "WARLOCK")
 local soulsConfig = {max = 5, key = "soulShards", colorKey = "SOULSHARDS", powerType = Enum.PowerType.SoulShards, eventType = "SOUL_SHARDS", icon = "Interface\\AddOns\\ShadowedUnitFrames\\media\\textures\\shard"}
@@ -7,8 +10,8 @@ local soulsConfig = {max = 5, key = "soulShards", colorKey = "SOULSHARDS", power
 function Souls:OnEnable(frame)
 	frame.soulShards = frame.soulShards or CreateFrame("Frame", nil, frame)
 	frame.soulShards.cpConfig = soulsConfig
-	frame.soulShards.cpConfig.max = (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION) and 50 or 5
-	frame.soulShards.cpConfig.grouping = (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION) and UnitPowerDisplayMod(soulsConfig.powerType) or 1
+	frame.soulShards.cpConfig.max = (GetSpec() == SPEC_WARLOCK_DESTRUCTION) and 50 or 5
+	frame.soulShards.cpConfig.grouping = (GetSpec() == SPEC_WARLOCK_DESTRUCTION) and UnitPowerDisplayMod(soulsConfig.powerType) or 1
 	frame.comboPointType = soulsConfig.key
 
 	frame:RegisterUnitEvent("UNIT_POWER_FREQUENT", self, "Update")
@@ -28,8 +31,8 @@ end
 function Souls:SpecChanged(frame)
 	-- update shard count on spec swap
 	if frame and frame.soulShards then
-		frame.soulShards.cpConfig.max = (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION) and 50 or 5
-		frame.soulShards.cpConfig.grouping = (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION) and UnitPowerDisplayMod(soulsConfig.powerType) or 1
+		frame.soulShards.cpConfig.max = (GetSpec() == SPEC_WARLOCK_DESTRUCTION) and 50 or 5
+		frame.soulShards.cpConfig.grouping = (GetSpec() == SPEC_WARLOCK_DESTRUCTION) and UnitPowerDisplayMod(soulsConfig.powerType) or 1
 	end
 	self:UpdateBarBlocks(frame)
 end
@@ -39,9 +42,9 @@ function Souls:GetComboPointType()
 end
 
 function Souls:GetPoints(unit)
-	return UnitPower("player", soulsConfig.powerType, (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION))
+	return UnitPower("player", soulsConfig.powerType, (GetSpec() == SPEC_WARLOCK_DESTRUCTION))
 end
 
 function Souls:GetMaxPoints(unit)
-	return UnitPowerMax("player", soulsConfig.powerType, (GetSpecialization() == SPEC_WARLOCK_DESTRUCTION))
+	return UnitPowerMax("player", soulsConfig.powerType, (GetSpec() == SPEC_WARLOCK_DESTRUCTION))
 end

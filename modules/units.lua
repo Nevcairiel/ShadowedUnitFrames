@@ -688,8 +688,8 @@ local function ClassToken(self)
 end
 
 local function ArenaClassToken(self)
-	local specID = GetArenaOpponentSpec(self.unitID)
-	return specID and select(6, GetSpecializationInfoByID(specID))
+	local specID = GetArenaOpponentSpec and GetArenaOpponentSpec(self.unitID)
+	return specID and GetSpecializationInfoByID and select(6, GetSpecializationInfoByID(specID))
 end
 
 function Units:CreateUnit(...)

@@ -5,8 +5,8 @@ ShadowUF:RegisterModule(Indicators, "indicators", ShadowUF.L["Indicators"])
 function Indicators:UpdateArenaSpec(frame)
 	if( not frame.indicators.arenaSpec or not frame.indicators.arenaSpec.enabled ) then return end
 
-	local specID = GetArenaOpponentSpec(frame.unitID)
-	local specIcon = specID and select(4, GetSpecializationInfoByID(specID))
+	local specID = GetArenaOpponentSpec and GetArenaOpponentSpec(frame.unitID)
+	local specIcon = specID and GetSpecializationInfoByID and select(4, GetSpecializationInfoByID(specID))
 	if( specIcon ) then
 		frame.indicators.arenaSpec:SetTexture(specIcon)
 		frame.indicators.arenaSpec:Show()
@@ -126,8 +126,8 @@ function Indicators:UpdateLFDRole(frame, event)
 	if( frame.unitType ~= "arena" ) then
 		role = UnitGroupRolesAssigned(frame.unitOwner)
 	else
-		local specID = GetArenaOpponentSpec(frame.unitID)
-		role = specID and select(6, GetSpecializationInfoByID(specID))
+		local specID = GetArenaOpponentSpec and GetArenaOpponentSpec(frame.unitID)
+		role = specID and GetSpecializationInfoByID and select(6, GetSpecializationInfoByID(specID))
 	end
 
 	if( role == "TANK" ) then
