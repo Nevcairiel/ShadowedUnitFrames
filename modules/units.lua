@@ -1503,7 +1503,7 @@ local function checkCurableSpells()
 	table.wipe(Units.canCure)
 
 	for spellID, cures in pairs(curableSpells) do
-		if( IsPlayerSpell(spellID) or IsSpellKnown(spellID, true) ) then
+		if( IsSpellKnown(spellID) ) then
 			for _, auraType in pairs(cures) do
 				Units.canCure[auraType] = true
 			end
