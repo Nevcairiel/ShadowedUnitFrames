@@ -655,12 +655,12 @@ function Auras:Update(frame)
 		scan(frame.auras, frame.auras.anchor, frame.auras.primary, config[frame.auras.primary], config[frame.auras.primary], frame.auras[frame.auras.primary].filter)
 		scan(frame.auras, frame.auras.anchor, frame.auras.secondary, config[frame.auras.secondary], config[frame.auras.primary], frame.auras[frame.auras.secondary].filter)
 	else
-		if( config.buffs.enabled ) then
+		if( config.buffs.enabled and frame.auras.buffs ) then
 			frame.auras.buffs.totalAuras = frame.auras.buffs.temporaryEnchants
 			scan(frame.auras, frame.auras.buffs, "buffs", config.buffs, config.buffs, frame.auras.buffs.filter)
 		end
 
-		if( config.debuffs.enabled ) then
+		if( config.debuffs.enabled and frame.auras.debuffs ) then
 			frame.auras.debuffs.totalAuras = 0
 			scan(frame.auras, frame.auras.debuffs, "debuffs", config.debuffs, config.debuffs, frame.auras.debuffs.filter)
 		end

@@ -695,6 +695,7 @@ end
 local function basicHideBlizzardFrames(...)
 	for i=1, select("#", ...) do
 		local frame = select(i, ...)
+		if not frame then break end
 		frame:UnregisterAllEvents()
 		frame:HookScript("OnShow", rehideFrame)
 		frame:Hide()
