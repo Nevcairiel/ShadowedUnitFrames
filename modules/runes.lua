@@ -26,6 +26,7 @@ function Runes:OnEnable(frame)
 	end
 
 	frame:RegisterNormalEvent("RUNE_POWER_UPDATE", self, "UpdateUsable")
+	frame:RegisterNormalEvent("RUNE_TYPE_UPDATE", self, "UpdateType")
 	frame:RegisterUpdateFunc(self, "UpdateUsable")
 end
 
@@ -47,11 +48,16 @@ function Runes:OnLayoutApplied(frame)
 		rune.background:SetTexture(ShadowUF.Layout.mediaPath.statusbar)
 		rune.background:SetHorizTile(false)
 		rune:SetStatusBarTexture(ShadowUF.Layout.mediaPath.statusbar)
-		rune:GetStatusBarTexture():SetHorizTile(false)
+
+		local statusBarTexture = rune:GetStatusBarTexture()
+		if statusBarTexture then
+			statusBarTexture:SetHorizTile(false)
+		end
+
 		rune:SetWidth(barWidth)
 
-		local color = ShadowUF.db.profile.powerColors.RUNES
-		frame:SetBlockColor(rune, "runeBar", color.r, color.g, color.b)
+		frame:SetBlockColor(rune, "runeBar", 0.5, 0.5, 0.5)
+		self:UpdateType(frame, "RUNE_TYPE_UPDATE", id)
 	end
 end
 
@@ -98,5 +104,36 @@ function Runes:UpdateUsable(frame, event, id, usable)
 
 	if( rune.fontString ) then
 		rune.fontString:UpdateTags()
+	end
+
+	self:UpdateType(frame, event, id)
+end
+
+-- Colorize a rune based off its current rune type (Blood/Frost/Unholy/Death)
+function Runes:UpdateType(frame, event, id, ...)
+	if( not id or not frame.runeBar.runes[id] ) then
+		return
+	end
+
+	local rune = frame.runeBar.runes[id]
+
+	local runeType = GetRuneType(id)
+	local color
+	-- RUNETYPE_BLOOD
+	if( runeType == 1 ) then
+		color = ShadowUF.db.profile.powerColors.RUNES_BLOOD
+	-- RUNETYPE_UNHOLY ("CHROMATIC")
+	elseif( runeType == 2 ) then
+		color = ShadowUF.db.profile.powerColors.RUNES_UNHOLY
+	-- RUNETYPE_FROST
+	elseif( runeType == 3 ) then
+		color = ShadowUF.db.profile.powerColors.RUNES_FROST
+	-- RUNETYPE_DEATH
+	elseif( runeType == 4 ) then
+		color = ShadowUF.db.profile.powerColors.RUNES_DEATH
+	end
+
+	if( color ) then
+		frame:SetBlockColor(rune, "runeBar", color.r, color.g, color.b)
 	end
 end
