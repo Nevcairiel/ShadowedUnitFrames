@@ -250,6 +250,18 @@ function Indicators:UpdateStatus(frame)
 	end
 end
 
+-- MoP 5.5.4 compat: READY_CHECK_*_TEXTURE may be plain texture paths instead of
+-- atlas names depending on the client, so fall back to SetTexture if the atlas
+-- doesn't actually exist.
+local function setReadyCheckTexture(texture, atlas)
+	if( atlas and C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(atlas) ) then
+		texture:SetAtlas(atlas, TextureKitConstants and TextureKitConstants.IgnoreAtlasSize)
+	elseif( atlas ) then
+		texture:SetTexCoord(0, 1, 0, 1)
+		texture:SetTexture(atlas)
+	end
+end
+
 local FADEOUT_TIME = 6
 function Indicators:UpdateReadyCheck(frame, event)
 	if( not frame.indicators.ready or not frame.indicators.ready.enabled ) then return end
@@ -288,7 +300,7 @@ function Indicators:UpdateReadyCheck(frame, event)
 
 		-- Player never responded so they are AFK
 		if( frame.indicators.ready.status == "waiting" ) then
-			frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+			setReadyCheckTexture(frame.indicators.ready, READY_CHECK_NOT_READY_TEXTURE)
 		end
 		return
 	end
@@ -302,11 +314,11 @@ function Indicators:UpdateReadyCheck(frame, event)
 	end
 
 	if( status == "ready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		setReadyCheckTexture(frame.indicators.ready, READY_CHECK_READY_TEXTURE)
 	elseif( status == "notready" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_NOT_READY_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		setReadyCheckTexture(frame.indicators.ready, READY_CHECK_NOT_READY_TEXTURE)
 	elseif( status == "waiting" ) then
-		frame.indicators.ready:SetAtlas(READY_CHECK_WAITING_TEXTURE, TextureKitConstants.IgnoreAtlasSize)
+		setReadyCheckTexture(frame.indicators.ready, READY_CHECK_WAITING_TEXTURE)
 	end
 
 	frame.indicators:SetScript("OnUpdate", nil)

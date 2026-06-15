@@ -31,9 +31,19 @@ function IncHeal:OnLayoutApplied(frame)
 	bar.total = nil
 
 	bar:SetSize(frame.healthBar:GetSize())
-	bar:SetStatusBarTexture(ShadowUF.Layout.mediaPath.statusbar)
+
+	local statusbar = ShadowUF.Layout.mediaPath.statusbar
+	if statusbar and statusbar ~= "" then
+		bar:SetStatusBarTexture(statusbar)
+	end
+
 	bar:SetStatusBarColor(ShadowUF.db.profile.healthColors[self.colorKey].r, ShadowUF.db.profile.healthColors[self.colorKey].g, ShadowUF.db.profile.healthColors[self.colorKey].b, ShadowUF.db.profile.bars.alpha)
-	bar:GetStatusBarTexture():SetHorizTile(false)
+
+	local statusBarTexture = bar:GetStatusBarTexture()
+	if statusBarTexture then
+		statusBarTexture:SetHorizTile(false)
+	end
+
 	bar:SetOrientation(frame.healthBar:GetOrientation())
 	bar:SetReverseFill(frame.healthBar:GetReverseFill())
 	bar:Hide()
