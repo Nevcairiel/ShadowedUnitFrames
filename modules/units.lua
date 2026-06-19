@@ -1486,7 +1486,10 @@ end
 -- Handle figuring out what auras players can cure
 local curableSpells = {
 	["DRUID"] = {[88423] = {"Magic", "Curse", "Poison"}, [2782] = {"Curse", "Poison"}},
-	["PRIEST"] = {[527] = {"Magic", "Disease"}, [32375] = {"Magic"}, [213634] = {"Disease"}},
+	-- Mass Dispel (32375) is omitted on purpose: in MoP it's baseline for all priest specs (incl. Shadow),
+	-- but most raid debuffs are flagged immune to it, so highlighting Magic debuffs as curable for Shadow
+	-- is a false positive. Single-target Magic dispel is Purify (527, Holy/Disc only).
+	["PRIEST"] = {[527] = {"Magic", "Disease"}, [213634] = {"Disease"}},
 	["PALADIN"] = {[4987] = {"Poison", "Disease", "Magic"}, [213644] = {"Poison", "Disease"}},
 	["SHAMAN"] = {[77130] = {"Curse", "Magic"}, [51886] = {"Curse"}, [383013] = {"Poison"}},
 	["MONK"] = {[115450] = {"Poison", "Disease", "Magic"}, [218164] = {"Poison", "Disease"}},
