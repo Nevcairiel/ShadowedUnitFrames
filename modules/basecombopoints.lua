@@ -183,11 +183,13 @@ function Combo:Update(frame, event, unit, powerType)
 		ShadowUF.Layout:SetBarVisibility(frame, key, ShadowUF.db.profile.units[frame.unitType][key].showAlways or (points and points > 0))
 	end
 
-	for id, pointTexture in pairs(frame[key].points) do
-		if( id <= points ) then
-			pointTexture:Show()
-		else
-			pointTexture:Hide()
+	if frame[key].points then
+		for id, pointTexture in pairs(frame[key].points) do
+			if( id <= points ) then
+				pointTexture:Show()
+			else
+				pointTexture:Hide()
+			end
 		end
 	end
 end
