@@ -1,0 +1,113 @@
+From 34cacf94088be4978b96eb0d1dff38e8dd86d813 Mon Sep 17 00:00:00 2001
+From: Brandon Thompson <bthompson@BOOK-1FP7SF02V3.>
+Date: Sat, 15 Mar 2025 00:33:14 -0700
+Subject: [PATCH] Fix power display for units out of range on era.
+
+
+diff --git a/modules/power.lua b/modules/power.lua
+index 74e9339..4cb037d 100755
+--- a/modules/power.lua
++++ b/modules/power.lua
+@@ -96,7 +96,8 @@ function Power:Update(frame, event, unit, powerType)
+ 	if( event and powerType and powerType ~= frame.powerBar.currentType ) then return end
+ 	if( frame.powerBar.minusMob ) then return end
+ 
++	local powerType = UnitPowerType(frame.unit)
+ 	frame.powerBar.currentPower = UnitPower(frame.unit)
+-	frame.powerBar:SetMinMaxValues(0, UnitPowerMax(frame.unit))
++	frame.powerBar:SetMinMaxValues(0, UnitPowerMax(frame.unit, powerType))
+ 	frame.powerBar:SetValue(UnitIsDeadOrGhost(frame.unit) and 0 or not UnitIsConnected(frame.unit) and 0 or frame.powerBar.currentPower)
+ end
+diff --git a/modules/tags.lua b/modules/tags.lua
+index 1a84598..bf1f1ba 100755
+--- a/modules/tags.lua
++++ b/modules/tags.lua
+@@ -590,7 +590,8 @@ Tags.defaultTags = {
+ 		return string.format("%s%s|r", color, name)
+ 	end]],
+ 	["curpp"] = [[function(unit, unitOwner)
+-		if( UnitPowerMax(unit) <= 0 ) then
++		local powerType = UnitPowerType(unit)
++		if( UnitPowerMax(unit, powerType) <= 0 ) then
+ 			return nil
+ 		elseif( UnitIsDeadOrGhost(unit) ) then
+ 			return 0
+@@ -644,7 +645,8 @@ Tags.defaultTags = {
+ 	end]],
+ 	["absmaxhp"] = [[function(unit, unitOwner) return UnitHealthMax(unit) end]],
+ 	["abscurpp"] = [[function(unit, unitOwner)
+-		if( UnitPowerMax(unit) <= 0 ) then
++		local powerType = UnitPowerType(unit)
++		if( UnitPowerMax(unit, powerType) <= 0 ) then
+ 			return nil
+ 		elseif( UnitIsDeadOrGhost(unit) ) then
+ 			return 0
+@@ -653,11 +655,13 @@ Tags.defaultTags = {
+ 		return UnitPower(unit)
+ 	end]],
+ 	["absmaxpp"] = [[function(unit, unitOwner)
+-		local power = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local power = UnitPowerMax(unit, powerType)
+ 		return power > 0 and power or nil
+ 	end]],
+ 	["absolutepp"] = [[function(unit, unitOwner)
+-		local maxPower = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local maxPower = UnitPowerMax(unit, powerType)
+ 		local power = UnitPower(unit)
+ 		if( UnitIsDeadOrGhost(unit) ) then
+ 			return string.format("0/%s", maxPower)
+@@ -668,7 +672,8 @@ Tags.defaultTags = {
+ 		return string.format("%s/%s", power, maxPower)
+ 	end]],
+ 	["curmaxpp"] = [[function(unit, unitOwner)
+-		local maxPower = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local maxPower = UnitPowerMax(unit, powerType)
+ 		local power = UnitPower(unit)
+ 		if( UnitIsDeadOrGhost(unit) ) then
+ 			return string.format("0/%s", ShadowUF:FormatLargeNumber(maxPower))
+@@ -679,7 +684,8 @@ Tags.defaultTags = {
+ 		return string.format("%s/%s", ShadowUF:FormatLargeNumber(power), ShadowUF:FormatLargeNumber(maxPower))
+ 	end]],
+ 	["smart:curmaxpp"] = [[function(unit, unitOwner)
+-		local maxPower = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local maxPower = UnitPowerMax(unit, powerType)
+ 		local power = UnitPower(unit)
+ 		if( UnitIsDeadOrGhost(unit) ) then
+ 			return string.format("0/%s", maxPower)
+@@ -713,7 +719,8 @@ Tags.defaultTags = {
+ 	end]],
+ 	["maxhp"] = [[function(unit, unitOwner) return ShadowUF:FormatLargeNumber(UnitHealthMax(unit)) end]],
+ 	["maxpp"] = [[function(unit, unitOwner)
+-		local power = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local power = UnitPowerMax(unit, powerType)
+ 		if( power <= 0 ) then
+ 			return nil
+ 		elseif( UnitIsDeadOrGhost(unit) ) then
+@@ -736,7 +743,8 @@ Tags.defaultTags = {
+ 		return "-" .. ShadowUF:FormatLargeNumber(missing)
+ 	end]],
+ 	["missingpp"] = [[function(unit, unitOwner)
+-		local power = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local power = UnitPowerMax(unit, powerType)
+ 		if( power <= 0 ) then
+ 			return nil
+ 		end
+@@ -769,7 +777,8 @@ Tags.defaultTags = {
+ 		return math.floor(UnitHealth(unit) / max * 100 + 0.5) .. "%"
+ 	end]],
+ 	["perpp"] = [[function(unit, unitOwner)
+-		local maxPower = UnitPowerMax(unit)
++		local powerType = UnitPowerType(unit)
++		local maxPower = UnitPowerMax(unit, powerType)
+ 		if( maxPower <= 0 ) then
+ 			return nil
+ 		elseif( UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) ) then
+-- 
+2.54.0
+
