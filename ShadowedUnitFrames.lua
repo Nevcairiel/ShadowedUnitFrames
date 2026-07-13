@@ -95,14 +95,26 @@ function ShadowUF:OnInitialize()
 	self.modules.movers:Update()
 end
 
+-- 2.5.6 compat: global UnitAura was removed in 2.5.6; provide a shared wrapper that falls back
+-- to C_UnitAuras.GetAuraDataByIndex + AuraUtil.UnpackAuraData (identical return order).
+if( type(UnitAura) == "function" ) then
+	ShadowUF.UnitAura = UnitAura
+elseif( C_UnitAuras and C_UnitAuras.GetAuraDataByIndex and AuraUtil and AuraUtil.UnpackAuraData ) then
+	ShadowUF.UnitAura = function(unit, index, filter)
+		return AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, index, filter))
+	end
+else
+	ShadowUF.UnitAura = UnitAura
+end
+
 function ShadowUF.UnitAuraBySpell(unit, spell, filter)
 	local index = 0
 	while true do
 		index = index + 1
-		local name, _, _, _, _, _, _, _, _, spellID = UnitAura(unit, index, filter)
+		local name, _, _, _, _, _, _, _, _, spellID = ShadowUF.UnitAura(unit, index, filter)
 		if not name then break end
 		if (type(spell) == "string" and spell == name) or (type(spell) == "number" and spell == spellID) then
-			return UnitAura(unit, index, filter)
+			return ShadowUF.UnitAura(unit, index, filter)
 		end
 	end
 end
