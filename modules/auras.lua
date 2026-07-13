@@ -11,19 +11,6 @@ if WoWClassic and LibClassicDurations then
 	LibClassicDurations:Register("ShadowUF")
 end
 
--- 2.5.6 compat: global UnitAura was removed in 2.5.6; use C_UnitAuras.GetAuraDataByIndex + AuraUtil.UnpackAuraData instead.
--- UnpackAuraData returns values in the exact same order as the old UnitAura, so no downstream unpacking changes are needed.
-local SUF_UnitAura
-if( type(UnitAura) == "function" ) then
-	SUF_UnitAura = UnitAura
-elseif( C_UnitAuras and C_UnitAuras.GetAuraDataByIndex and AuraUtil and AuraUtil.UnpackAuraData ) then
-	SUF_UnitAura = function(unit, index, filter)
-		return AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, index, filter))
-	end
-else
-	SUF_UnitAura = UnitAura
-end
-
 -- 2.5.6 compat: the global DebuffTypeColor table was removed. SUF's auras/highlight/health
 -- modules still index it (DebuffTypeColor[auraType], DebuffTypeColor.none, DebuffTypeColor[""]).
 -- Rebuild it from the engine's DEBUFF_TYPE_*_COLOR ColorMixin constants when available,
@@ -66,7 +53,7 @@ function Auras:OnEnable(frame)
 			end
 		end)
 	else
-		frame.auras.auraFunc = SUF_UnitAura
+		frame.auras.auraFunc = ShadowUF.UnitAura
 	end
 end
 
@@ -255,7 +242,7 @@ local function showTooltip(self)
 	if( self.filter == "TEMP" ) then
 		GameTooltip:SetInventoryItem("player", self.auraID)
 		self:SetScript("OnUpdate", nil)
-	elseif( self.unit == "target" and not SUF_UnitAura(self.unit, self.auraID, self.filter) ) then
+	elseif( self.unit == "target" and not ShadowUF.UnitAura(self.unit, self.auraID, self.filter) ) then
 		GameTooltip:SetSpellByID(self.spellID, true, true)
 		self:SetScript("OnUpdate", nil)
 	else
