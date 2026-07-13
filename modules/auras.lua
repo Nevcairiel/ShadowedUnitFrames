@@ -11,6 +11,42 @@ if WoWClassic and LibClassicDurations then
 	LibClassicDurations:Register("ShadowUF")
 end
 
+-- 2.5.6 compat: global UnitAura was removed in 2.5.6; use C_UnitAuras.GetAuraDataByIndex + AuraUtil.UnpackAuraData instead.
+-- UnpackAuraData returns values in the exact same order as the old UnitAura, so no downstream unpacking changes are needed.
+local SUF_UnitAura
+if( type(UnitAura) == "function" ) then
+	SUF_UnitAura = UnitAura
+elseif( C_UnitAuras and C_UnitAuras.GetAuraDataByIndex and AuraUtil and AuraUtil.UnpackAuraData ) then
+	SUF_UnitAura = function(unit, index, filter)
+		return AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, index, filter))
+	end
+else
+	SUF_UnitAura = UnitAura
+end
+
+-- 2.5.6 compat: the global DebuffTypeColor table was removed. SUF's auras/highlight/health
+-- modules still index it (DebuffTypeColor[auraType], DebuffTypeColor.none, DebuffTypeColor[""]).
+-- Rebuild it from the engine's DEBUFF_TYPE_*_COLOR ColorMixin constants when available,
+-- falling back to WoW's long-standing fixed RGB values otherwise.
+if( type(DebuffTypeColor) ~= "table" ) then
+	local function dispelColor(colorObj, r, g, b)
+		if( type(colorObj) == "table" and colorObj.r ) then
+			return { r = colorObj.r, g = colorObj.g, b = colorObj.b }
+		end
+		return { r = r, g = g, b = b }
+	end
+
+	local none = dispelColor(DEBUFF_TYPE_NONE_COLOR, 0.80, 0, 0)
+	DebuffTypeColor = {
+		["Magic"]   = dispelColor(DEBUFF_TYPE_MAGIC_COLOR,   0.20, 0.60, 1.00),
+		["Curse"]   = dispelColor(DEBUFF_TYPE_CURSE_COLOR,   0.60, 0.00, 1.00),
+		["Disease"] = dispelColor(DEBUFF_TYPE_DISEASE_COLOR, 0.60, 0.40, 0.00),
+		["Poison"]  = dispelColor(DEBUFF_TYPE_POISON_COLOR,  0.00, 0.60, 0.00),
+		["none"]    = none,
+		[""]        = none,
+	}
+end
+
 function Auras:OnEnable(frame)
 	frame.auras = frame.auras or {}
 
@@ -30,7 +66,7 @@ function Auras:OnEnable(frame)
 			end
 		end)
 	else
-		frame.auras.auraFunc = UnitAura
+		frame.auras.auraFunc = SUF_UnitAura
 	end
 end
 
@@ -219,7 +255,7 @@ local function showTooltip(self)
 	if( self.filter == "TEMP" ) then
 		GameTooltip:SetInventoryItem("player", self.auraID)
 		self:SetScript("OnUpdate", nil)
-	elseif( self.unit == "target" and not UnitAura(self.unit, self.auraID, self.filter) ) then
+	elseif( self.unit == "target" and not SUF_UnitAura(self.unit, self.auraID, self.filter) ) then
 		GameTooltip:SetSpellByID(self.spellID, true, true)
 		self:SetScript("OnUpdate", nil)
 	else
