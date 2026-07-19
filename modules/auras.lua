@@ -559,7 +559,7 @@ local function renderAura(parent, frame, type, config, displayConfig, index, fil
 	if( isRemovable and not isFriendly and not ShadowUF.db.profile.auras.disableColor ) then
 		button.border:SetVertexColor(ShadowUF.db.profile.auraColors.removable.r, ShadowUF.db.profile.auraColors.removable.g, ShadowUF.db.profile.auraColors.removable.b)
 	elseif( ( not isFriendly or type == "debuffs" ) and not ShadowUF.db.profile.auras.disableColor ) then
-		local color = auraType and DebuffTypeColor[auraType] or DebuffTypeColor.none
+		local color = ShadowUF.API.GetDebuffTypeColor(auraType)
 		button.border:SetVertexColor(color.r, color.g, color.b)
 	else
 		button.border:SetVertexColor(0.60, 0.60, 0.60)
