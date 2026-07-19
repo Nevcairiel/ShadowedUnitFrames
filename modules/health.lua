@@ -90,7 +90,7 @@ function Health:UpdateColor(frame)
 		frame:SetBarColor("healthBar", ShadowUF.db.profile.healthColors.offline.r, ShadowUF.db.profile.healthColors.offline.g, ShadowUF.db.profile.healthColors.offline.b)
 		return
 	elseif( ShadowUF.db.profile.units[frame.unitType].healthBar.colorDispel and frame.healthBar.hasDebuff ) then
-		color = DebuffTypeColor[frame.healthBar.hasDebuff]
+		color = ShadowUF.API.GetDebuffTypeColor(frame.healthBar.hasDebuff)
 	elseif( not UnitPlayerControlled(unit) and UnitIsTapDenied(unit) and UnitCanAttack("player", unit) ) then
 		color = ShadowUF.db.profile.healthColors.tapped
 	elseif( not UnitPlayerOrPetInRaid(unit) and not UnitPlayerOrPetInParty(unit) and ( ( ( reactionType == "player" or reactionType == "both" ) and UnitIsPlayer(unit) and not UnitIsFriend(unit, "player") ) or ( ( reactionType == "npc" or reactionType == "both" )  and not UnitIsPlayer(unit) ) ) ) then
