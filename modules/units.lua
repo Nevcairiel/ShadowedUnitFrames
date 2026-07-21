@@ -8,6 +8,8 @@ local stateMonitor = CreateFrame("Frame", nil, nil, "SecureHandlerBaseTemplate")
 stateMonitor.raids = {}
 local playerClass = select(2, UnitClass("player"))
 local unitFrames, headerFrames, frameList, unitEvents, childUnits, headerUnits, queuedCombat, zoneUnits = Units.unitFrames, Units.headerFrames, Units.frameList, Units.unitEvents, Units.childUnits, Units.headerUnits, {}, Units.zoneUnits
+-- Frames created during combat need RegisterForClicks deferred until combat ends
+local pendingClickFrames = {}
 local remappedUnits = Units.remappedUnits
 local _G = getfenv(0)
 
@@ -589,7 +591,12 @@ function Units:CreateUnit(...)
 	frame.OnEnter = SUF_OnEnter
 	frame.OnLeave = SUF_OnLeave
 
-	frame:RegisterForClicks("AnyUp")
+	-- RegisterForClicks is protected; defer during combat to avoid ADDON_ACTION_BLOCKED
+	if( not InCombatLockdown() ) then
+		frame:RegisterForClicks("AnyUp")
+	else
+		pendingClickFrames[frame] = true
+	end
 	-- non-header frames don't set those, so we need to do it
 	if( not InCombatLockdown() and not frame:GetAttribute("isHeaderDriven") ) then
 		frame:SetAttribute("*type1", "target")
@@ -1397,6 +1404,13 @@ centralFrame:SetScript("OnEvent", function(self, event, unit)
 		end
 
 		table.wipe(queuedCombat)
+
+		-- Register clicks for frames created during combat
+		for frame in pairs(pendingClickFrames) do
+			frame:RegisterForClicks("AnyUp")
+		end
+
+		table.wipe(pendingClickFrames)
 
 		if( queueZoneCheck ) then
 			Units:CheckPlayerZone(queueZoneCheck == 2 and true)
