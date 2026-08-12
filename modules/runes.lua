@@ -49,7 +49,12 @@ function Runes:OnLayoutApplied(frame)
 		rune.background:SetTexture(ShadowUF.Layout.mediaPath.statusbar)
 		rune.background:SetHorizTile(false)
 		rune:SetStatusBarTexture(ShadowUF.Layout.mediaPath.statusbar)
-		rune:GetStatusBarTexture():SetHorizTile(false)
+
+		local statusBarTexture = rune:GetStatusBarTexture()
+		if statusBarTexture then
+			statusBarTexture:SetHorizTile(false)
+		end
+
 		rune:SetWidth(barWidth)
 
 		frame:SetBlockColor(rune, "runeBar", 0.5, 0.5, 0.5)

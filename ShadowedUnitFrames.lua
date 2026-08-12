@@ -4,6 +4,21 @@
 
 ShadowUF = select(2, ...)
 
+-- MoP 5.5.4 compat: DebuffTypeColor was replaced by individual globals
+-- (DEBUFF_TYPE_MAGIC_COLOR etc.). Rebuild the table from those if present,
+-- falling back to the classic WoW defaults so debuff border colours remain
+-- correct without hardcoding values that could differ per locale/patch.
+if not DebuffTypeColor then
+	DebuffTypeColor = {
+		["Magic"]   = DEBUFF_TYPE_MAGIC_COLOR   or {r = 0.20, g = 0.60, b = 1.00},
+		["Curse"]   = DEBUFF_TYPE_CURSE_COLOR   or {r = 0.60, g = 0.00, b = 1.00},
+		["Disease"] = DEBUFF_TYPE_DISEASE_COLOR or {r = 0.60, g = 0.40, b = 0.00},
+		["Poison"]  = DEBUFF_TYPE_POISON_COLOR  or {r = 0.00, g = 0.60, b = 0.00},
+		["none"]    = DEBUFF_TYPE_NONE_COLOR    or {r = 0.80, g = 0.00, b = 0.00},
+		[""]        = DEBUFF_TYPE_NONE_COLOR    or {r = 0.80, g = 0.00, b = 0.00},
+	}
+end
+
 local L = ShadowUF.L
 ShadowUF.dbRevision = 61
 ShadowUF.dbRevisionClassic = 6
@@ -687,6 +702,7 @@ end
 local function basicHideBlizzardFrames(...)
 	for i=1, select("#", ...) do
 		local frame = select(i, ...)
+		if not frame then break end
 		frame:UnregisterAllEvents()
 		frame:HookScript("OnShow", rehideFrame)
 		frame:Hide()
@@ -696,6 +712,7 @@ end
 local function hideBlizzardFrames(taint, ...)
 	for i=1, select("#", ...) do
 		local frame = select(i, ...)
+		if not frame then break end
 		UnregisterUnitWatch(frame)
 		frame:UnregisterAllEvents()
 		frame:Hide()
@@ -716,8 +733,9 @@ end
 
 local active_hiddens = {}
 function ShadowUF:HideBlizzardFrames()
+	if not self.db then return end
 	if( self.db.profile.hidden.cast and not active_hiddens.cast ) then
-		hideBlizzardFrames(true, CastingBarFrame, PetCastingBarFrame)
+		hideBlizzardFrames(true, PlayerCastingBarFrame or CastingBarFrame, PetCastingBarFrame)
 	end
 
 	if( self.db.profile.hidden.party and not active_hiddens.party ) then
